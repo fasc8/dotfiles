@@ -1,0 +1,177 @@
+
+// To view the default settings, hold "alt" while clicking on the "Settings" button.
+// For documentation on these settings, see: https://aka.ms/terminal-documentation
+
+{
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+
+    "defaultProfile": "{58ad8b0c-3ef8-5f4d-bc6f-13e4c00f2530}",
+
+    "profiles":
+    {
+        "defaults":
+        {
+            // Put settings here that you want to apply to all profiles
+        },
+        "list":
+        [
+            {
+                // Make changes here to the powershell.exe profile
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "name": "Windows PowerShell",
+                "commandline": "powershell.exe",
+                "hidden": false
+            },
+            {
+                // Make changes here to the cmd.exe profile
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "name": "cmd",
+                "commandline": "cmd.exe",
+                "hidden": false
+            },
+            {
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": false,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            },
+            {
+                "guid": "{58ad8b0c-3ef8-5f4d-bc6f-13e4c00f2530}",
+                "hidden": false,
+                "name": "Debian",
+                "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "backgroundImageOpacity": 0.4,
+                "backgroundImageStretchMode": "uniform",
+                "closeOnExit": true,
+                "colorScheme": "Solarized Dark",
+                "commandline": "cmd.exe /k \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\Tools\\VsDevCmd.bat\"",
+                "cursorColor": "#FFFFFF",
+                "cursorShape": "bar",
+                "fontFace": "Consolas",
+                "fontSize": 12,
+                "guid": "{26b30263-74e9-4146-b80e-11632e86d42c}",
+                "historySize": 9001,
+                "name": "VS2019 Dev Prompt",
+                "padding": "0, 0, 0, 0",
+                "snapOnInput": true
+            }
+        ]
+    },
+
+    // Add custom color schemes to this array
+    "schemes": [{
+        "name": "tomorrow-night-256",
+        "background": "#1d1f21",
+        "black": "#1d1f21",
+        "blue": "#81a2be",
+        "brightBlack": "#969896",
+        "brightBlue": "#81a2be",
+        "brightCyan": "#8abeb7",
+        "brightGreen": "#b5bd68",
+        "brightPurple": "#b294bb",
+        "brightRed": "#cc6666",
+        "brightWhite": "#FFFFFF",
+        "brightYellow": "#f0c674",
+        "cyan": "#8abeb7",
+        "foreground": "#c5c8c6",
+        "green": "#b5bd68",
+        "purple": "#b294bb",
+        "red": "#cc6666",
+        "white": "#F8F8F2",
+        "yellow": "#f0c674"
+    }],
+
+    // Add any keybinding overrides to this array.
+    // To unbind a default keybinding, set the command to "unbound"
+    "keybindings": [{
+        "command": "newTab",
+        "keys": [
+            "ctrl+shift+n"
+        ]
+    },
+    {
+        "command": "closeTab",
+        "keys": [
+            "ctrl+shift+w"
+        ]
+    },
+    {
+        "command": "closePane",
+        "keys": ["alt+shift+x"]
+    },
+    {
+        "command": 
+        { 
+            "action": "splitPane", 
+            "split": "horizontal" 
+        },
+        "keys": ["alt+shift+-"]
+    },
+    {
+        "command": 
+        { 
+            "action": "splitPane", 
+            "split": "vertical" 
+        },
+        "keys": ["alt+shift+plus"]
+    },
+    {
+        "command": {
+            "action": "moveFocus",
+            "direction": "down"
+        },
+        "keys": ["alt+down"]
+    },
+    {
+        "command": {
+            "action": "moveFocus",
+            "direction": "left"
+        },
+        "keys": ["alt+left"]
+    },
+    {
+        "command": {
+            "action": "moveFocus",
+            "direction": "right"
+        },
+        "keys": ["alt+right"]
+    },
+    {
+        "command": {
+            "action": "moveFocus",
+            "direction": "up"
+        },
+        "keys": ["alt+up"]
+    },
+    {
+        "command": {
+            "action": "resizePane",
+            "direction": "down"
+        },
+        "keys": ["alt+shift+down"]
+    },
+    {
+        "command": {
+            "action": "resizePane",
+            "direction": "left"
+        },
+        "keys": ["alt+shift+left"]
+    },
+    {
+        "command": {
+            "action": "resizePane",
+            "direction": "right"
+        },
+        "keys": ["alt+shift+right"]
+    },
+    {
+        "command": {
+            "action": "resizePane",
+            "direction": "up"
+        },
+        "keys": ["alt+shift+up"]
+    }
+]
+}
