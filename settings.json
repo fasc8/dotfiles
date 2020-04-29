@@ -1,21 +1,16 @@
-
 // To view the default settings, hold "alt" while clicking on the "Settings" button.
 // For documentation on these settings, see: https://aka.ms/terminal-documentation
 
 {
     "$schema": "https://aka.ms/terminal-profiles-schema",
 
-    "defaultProfile": "{58ad8b0c-3ef8-5f4d-bc6f-13e4c00f2530}",
+    "defaultProfile": "{2c4de342-38b7-51cf-b940-2309a097f518}",
 
-    "profiles":
-    {
-        "defaults":
-        {
+    "profiles": {
+        "defaults": {
             // Put settings here that you want to apply to all profiles
         },
-        "list":
-        [
-            {
+        "list": [{
                 // Make changes here to the powershell.exe profile
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "name": "Windows PowerShell",
@@ -36,26 +31,11 @@
                 "source": "Windows.Terminal.Azure"
             },
             {
-                "guid": "{58ad8b0c-3ef8-5f4d-bc6f-13e4c00f2530}",
+                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
                 "hidden": false,
-                "name": "Debian",
-                "source": "Windows.Terminal.Wsl"
-            },
-            {
-                "backgroundImageOpacity": 0.4,
-                "backgroundImageStretchMode": "uniform",
-                "closeOnExit": true,
-                "colorScheme": "Solarized Dark",
-                "commandline": "cmd.exe /k \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\Tools\\VsDevCmd.bat\"",
-                "cursorColor": "#FFFFFF",
-                "cursorShape": "bar",
-                "fontFace": "Consolas",
-                "fontSize": 12,
-                "guid": "{26b30263-74e9-4146-b80e-11632e86d42c}",
-                "historySize": 9001,
-                "name": "VS2019 Dev Prompt",
-                "padding": "0, 0, 0, 0",
-                "snapOnInput": true
+                "name": "Ubuntu",
+                "source": "Windows.Terminal.Wsl",
+                "colorScheme": "tomorrow-night-256"
             }
         ]
     },
@@ -86,92 +66,92 @@
     // Add any keybinding overrides to this array.
     // To unbind a default keybinding, set the command to "unbound"
     "keybindings": [{
-        "command": "newTab",
-        "keys": [
-            "ctrl+shift+n"
-        ]
-    },
-    {
-        "command": "closeTab",
-        "keys": [
-            "ctrl+shift+w"
-        ]
-    },
-    {
-        "command": "closePane",
-        "keys": ["alt+shift+x"]
-    },
-    {
-        "command": 
-        { 
-            "action": "splitPane", 
-            "split": "horizontal" 
+            "command": "newTab",
+            "keys": [
+                "ctrl+shift+n"
+            ]
         },
-        "keys": ["alt+shift+-"]
-    },
-    {
-        "command": 
-        { 
-            "action": "splitPane", 
-            "split": "vertical" 
+        {
+            "command": "closeTab",
+            "keys": [
+                "ctrl+shift+w"
+            ]
         },
-        "keys": ["alt+shift+plus"]
-    },
-    {
-        "command": {
-            "action": "moveFocus",
-            "direction": "down"
+        {
+            "command": "closePane",
+            "keys": ["alt+shift+x"]
         },
-        "keys": ["alt+down"]
-    },
-    {
-        "command": {
-            "action": "moveFocus",
-            "direction": "left"
+        {
+            "command": 
+            { 
+                "action": "splitPane", 
+                "split": "horizontal" 
+            },
+            "keys": ["alt+shift+-"]
         },
-        "keys": ["alt+left"]
-    },
-    {
-        "command": {
-            "action": "moveFocus",
-            "direction": "right"
+        {
+            "command": 
+            { 
+                "action": "splitPane", 
+                "split": "vertical" 
+            },
+            "keys": ["alt+shift+plus"]
         },
-        "keys": ["alt+right"]
-    },
-    {
-        "command": {
-            "action": "moveFocus",
-            "direction": "up"
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "down"
+            },
+            "keys": ["alt+down"]
         },
-        "keys": ["alt+up"]
-    },
-    {
-        "command": {
-            "action": "resizePane",
-            "direction": "down"
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "left"
+            },
+            "keys": ["alt+left"]
         },
-        "keys": ["alt+shift+down"]
-    },
-    {
-        "command": {
-            "action": "resizePane",
-            "direction": "left"
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "right"
+            },
+            "keys": ["alt+right"]
         },
-        "keys": ["alt+shift+left"]
-    },
-    {
-        "command": {
-            "action": "resizePane",
-            "direction": "right"
+        {
+            "command": {
+                "action": "moveFocus",
+                "direction": "up"
+            },
+            "keys": ["alt+up"]
         },
-        "keys": ["alt+shift+right"]
-    },
-    {
-        "command": {
-            "action": "resizePane",
-            "direction": "up"
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "down"
+            },
+            "keys": ["alt+shift+down"]
         },
-        "keys": ["alt+shift+up"]
-    }
-]
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "left"
+            },
+            "keys": ["alt+shift+left"]
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "right"
+            },
+            "keys": ["alt+shift+right"]
+        },
+        {
+            "command": {
+                "action": "resizePane",
+                "direction": "up"
+            },
+            "keys": ["alt+shift+up"]
+        }
+    ]
 }
