@@ -1,0 +1,1 @@
+Show the prefix-key when pressed:	https://github.com/tmux-plugins/tmux-prefix-highlight
