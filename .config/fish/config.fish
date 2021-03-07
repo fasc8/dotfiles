@@ -21,12 +21,12 @@ else
 
     # Base aliases
     alias l "ls -lah"
-    #alias vi "nvim"
-    #alias vim "nvim"
+    alias vi "nvim"
+    alias vim "nvim"
 
     # Set preferred editors and pagers
-    set -gx EDITOR vim
-    set -gx VISUAL vim
+    set -gx EDITOR nvim
+    set -gx VISUAL nvim
     set -gx PAGER less
     set -gx MANPAGER 'less -X'
 
