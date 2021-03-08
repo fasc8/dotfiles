@@ -36,4 +36,10 @@ else
     # Colorscheme
     source $HOME/.config/fish/colorscheme.fish &> /dev/null
 
+    # fzf
+    if test -d $HOME/.fzf/shell
+        source $HOME/.fzf/shell/key-bindings.fish
+        set -x FZF_DEFAULT_COMMAND 'rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+    end
+
 end

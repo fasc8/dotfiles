@@ -1,9 +1,3 @@
-" download vim-plug if missing
-if empty(glob("~/.vim/autoload/plug.vim"))
-  silent! execute '!curl --create-dirs -fsSLo ~/.vim/autoload/plug.vim https://raw.github.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * silent! PlugInstall
-endif
-
 " =====> general settings <=====================================================
 set omnifunc=syntaxcomplete#Complete
 set scrolloff=1
@@ -119,7 +113,7 @@ au BufEnter * if &buftype == 'terminal' | :startinsert | endif
 " open terminal on ctrl+;
 " uses zsh instead of bash
 function! OpenTerminal()
-  split term://bash
+  split term://fish
   resize 10
 endfunction
 nnoremap <c-n> :call OpenTerminal()<CR>
