@@ -6,7 +6,7 @@ cd "$HOME"
 
 # If fish is default SHELL install fisher
 if [ "$SHELL" = "/usr/bin/fish" ]; then
-  if ! command -v fisher >/dev/null 2>&1; then
+  if ! [ -f ~/.config/fish/functions/fisher.fish ]; then
     echo "fish shell found: Install fisher"
     fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
   fi
