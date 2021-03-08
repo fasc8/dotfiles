@@ -16,3 +16,4 @@ My dotfiles repo
 - dstat - system stats
 - ncdu - see storage space each folder requires
 - cfdisk - like fdisk with a nicer interface
+- [glow - Markdown in CLI viewer](https://github.com/charmbracelet/glow)
