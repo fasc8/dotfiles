@@ -9,6 +9,7 @@ if [ "$SHELL" = "/usr/bin/fish" ]; then
   if ! [ -f ~/.config/fish/functions/fisher.fish ]; then
     echo "fish shell found: Install fisher"
     fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
+    fish -c "fisher install IlanCosman/tide"
   fi
 fi
 
@@ -16,7 +17,12 @@ if command -v nvim >/dev/null 2>&1; then
   echo "Bootstraping nVim"
   curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  sudo apt install python-pip python3-pip
+  
+  if command -v apt >/dev/null 2>&1; then  
+    sudo apt install python3-pip
+  elif command -v pacman -h >/dev/null 2>&1; then
+    sudo pacman -S python-pip
+  fi
   sudo pip3 install --upgrade neovim
   nvim '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
 fi
