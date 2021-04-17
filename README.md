@@ -17,3 +17,5 @@ My dotfiles repo
 - ncdu - see storage space each folder requires
 - cfdisk - like fdisk with a nicer interface
 - [glow - Markdown in CLI viewer](https://github.com/charmbracelet/glow)
+- [pspy - for seeing what processes run](https://github.com/DominicBreuker/pspy)
+- [updog - advanced python http server](https://github.com/sc0tfree/updog)
