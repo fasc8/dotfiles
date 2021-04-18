@@ -45,8 +45,6 @@ abbr --add grh 'git reset --hard'
 abbr --add gst 'git status'
 abbr --add gt 'git tag'
 abbr --add gts 'git tag -s'
-abbr --add lg 'lazygit'
-abbr --add ts 'tig status'
 
 # yadm shortcuts
 abbr --add ya 'yadm add'
