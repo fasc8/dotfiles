@@ -361,10 +361,6 @@ let &t_SI = "\<Esc>[6 q"
 let &t_SR = "\<Esc>[4 q"
 let &t_EI = "\<Esc>[2 q"
 
-" ====> load neovim plugins
-vmap <C-x> :!pbcopy<CR>
-vmap <C-c> :w !pbcopy<CR><CR>
-
 "" Buffer nav
 noremap <leader>z :bp<CR>
 noremap <leader>q :bp<CR>
