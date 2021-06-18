@@ -44,5 +44,12 @@ else
         source $HOME/.fzf/shell/key-bindings.fish
         set -x FZF_DEFAULT_COMMAND 'rg --files --no-ignore --hidden --follow --glob "!.git/*"'
     end
+    
+    # Start X at login
+    if status is-login
+        if test -z "$DISPLAY" -a "$XDG_VTNR" = 1
+            exec startx -- -keeptty
+        end
+    end
 
 end
