@@ -19,16 +19,14 @@ else
     set -gx LC_ALL en_US.UTF-8
     set -gx LC_CTYPE en_US.UTF-8
 
-    # Base aliases
-    alias l "ls -lah"
-    alias vi "nvim"
-    alias vim "nvim"
-
     # Set preferred editors and pagers
     set -gx EDITOR nvim
     set -gx VISUAL nvim
     set -gx PAGER less
     set -gx MANPAGER 'less -X'
+
+    # Aliasess
+    source $HOME/.config/fish/aliase.fish &> /dev/null
 
     # Abbreviations
     source $HOME/.config/fish/abbreviations.fish &> /dev/null
