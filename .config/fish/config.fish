@@ -26,7 +26,7 @@ else
     set -gx MANPAGER 'less -X'
 
     # Aliasess
-    source $HOME/.config/fish/aliase.fish &> /dev/null
+    source $HOME/.config/fish/aliases.fish &> /dev/null
 
     # Abbreviations
     source $HOME/.config/fish/abbreviations.fish &> /dev/null
