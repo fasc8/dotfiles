@@ -1,5 +1,4 @@
 # Base aliases
-alias l "ls -lah"
 alias vi "nvim"
 alias vim "nvim"
 
@@ -9,6 +8,12 @@ end
 
 if type -q exa
     alias ls "exa"
-    alias la "ls -lah"
-    alias ll "ls -lh"
+    alias la "exa -lah"
+    alias ll "exa -lh"
+    alias l "exa -lah"
+else
+    alias ls "ls"
+    alias la "ls -la"
+    alias ll "exa -lh"
+    alias l "ls -lah"
 end
