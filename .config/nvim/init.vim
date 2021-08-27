@@ -286,6 +286,7 @@ cnoremap %s/ %sm/A
 " Ctrl+h to stop searching
 vnoremap <C-h> :nohlsearch<cr>
 nnoremap <C-h> :nohlsearch<cr>
+inoremap <C-h> :nohlsearch<cr>
 
 " Suspend with Ctrl+f
 inoremap <C-f> :sus<cr>
@@ -390,6 +391,7 @@ endif
 cnoremap <C-P> <C-R>=expand("%:p:h") . "/" <CR>
 nnoremap <silent> <leader>b :Buffers<CR>
 nnoremap <silent> <leader>f :FZF -m<CR>
+
 "Recovery commands from history through FZF
 nmap <leader>y :History:<CR>
 
@@ -445,11 +447,3 @@ autocmd BufReadPost *
 
 
 
-
-
-"
-""*****************************************************************************
-""" Visual Settings
-""*****************************************************************************
-"let g:CSApprox_loaded = 1
-"

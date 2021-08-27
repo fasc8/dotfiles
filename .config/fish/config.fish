@@ -34,6 +34,9 @@ else
     # Environment
     source $HOME/.config/fish/env.fish &> /dev/null
 
+    # Bindings
+    source $HOME/.config/fish/binds.fish &> /dev/null
+
     # Colorscheme
     source $HOME/.config/fish/colorscheme.fish &> /dev/null
 
