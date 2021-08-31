@@ -187,9 +187,6 @@ function! LightlineFilename()
   return expand('%:t') !=# '' ? @% : '[No Name]'
 endfunction
 
-" Quick-save
-nmap <leader>w :w<CR>
-
 " rust
 let g:rustfmt_autosave = 1
 let g:rustfmt_emit_files = 1
@@ -268,6 +265,12 @@ set ignorecase
 set smartcase
 set gdefault
 
+" =============================================================================
+" # Keyboard shortcuts
+" =============================================================================
+" Quick-save
+nmap <leader>w :w<CR>
+
 " Search results centered please
 nnoremap <silent> n nzz
 nnoremap <silent> N Nzz
@@ -280,13 +283,10 @@ nnoremap ? ?\v
 nnoremap / /\v
 cnoremap %s/ %sm/A
 
-" =============================================================================
-" # Keyboard shortcuts
-" =============================================================================
-" Ctrl+h to stop searching
-vnoremap <C-h> :nohlsearch<cr>
-nnoremap <C-h> :nohlsearch<cr>
-inoremap <C-h> :nohlsearch<cr>
+" Ctrl+s to stop searching
+vnoremap <C-s> :nohlsearch<cr>
+nnoremap <C-s> :nohlsearch<cr>
+inoremap <C-s> :nohlsearch<cr>
 
 " Suspend with Ctrl+f
 inoremap <C-f> :sus<cr>
