@@ -235,9 +235,9 @@ set undodir=~/.vimdid
 set undofile
 
 """ Tabs. May be overridden by autocmd rules
-set tabstop=4
+set tabstop=2
 set softtabstop=0
-set shiftwidth=4
+set shiftwidth=2
 set expandtab
 
 """ Fix backspace indent
