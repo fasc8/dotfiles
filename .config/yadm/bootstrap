@@ -32,7 +32,7 @@ if ! command -v nvim >/dev/null 2>&1; then
   elif [ $pck_mngr = "pacman" ]; then
     sudo pacman -S base-devel cmake unzip ninja tree-sitter curl
   fi
-  
+
   mkdir /tmp/neovim
   git clone https://github.com/neovim/neovim /tmp/neovim
   git checkout stable
@@ -41,6 +41,11 @@ if ! command -v nvim >/dev/null 2>&1; then
   rm -rf /tmp/neovim
 
   nvim --version
+  nvim '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
+fi
+
+if command -v nvim >/dev/null 2>&1; then
+  echo "Update nvim plugins"
   nvim '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
 fi
 
