@@ -45,6 +45,7 @@ abbr --add grh 'git reset --hard'
 abbr --add gst 'git status'
 abbr --add gt 'git tag'
 abbr --add gts 'git tag -s'
+abbr --add gru 'git remote update'
 
 # yadm shortcuts
 abbr --add ya 'yadm add'
