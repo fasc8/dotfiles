@@ -17,6 +17,11 @@ if [ "$SHELL" = "/usr/bin/fish" ]; then
     echo "fish shell found: Install fisher"
     fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
     fish -c "fisher install IlanCosman/tide"
+  elif ! command -v fisher >/dev/null 2>&1; then
+    echo "fisher command not found. Install fisher."
+    rm ~/.config/fish/completions/fisher.fish
+    fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
+    fish -c "fisher install IlanCosman/tide"
   fi
 fi
 
@@ -41,7 +46,7 @@ if ! command -v nvim >/dev/null 2>&1; then
   rm -rf /tmp/neovim
 
   nvim --version
-  nvim '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
+  nvim '+PlugInstall' '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
 fi
 
 if command -v nvim >/dev/null 2>&1; then
