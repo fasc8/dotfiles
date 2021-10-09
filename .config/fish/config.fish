@@ -44,6 +44,7 @@ else
     if test -d $HOME/.fzf/shell
         source $HOME/.fzf/shell/key-bindings.fish
         set -x FZF_DEFAULT_COMMAND 'rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+        fzf_key_bindings
     end
 
     # Start X
