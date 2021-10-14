@@ -8,12 +8,12 @@ end
 
 if type -q exa
     alias ls "exa"
-    alias la "exa -lah"
-    alias ll "exa -lh"
-    alias l "exa -lah"
+    alias la "exa -lagh"
+    alias ll "exa -lgh"
+    alias l "exa -lagh"
 else
     alias ls "ls"
     alias la "ls -la"
-    alias ll "exa -lh"
+    alias ll "ls -lh"
     alias l "ls -lah"
 end
