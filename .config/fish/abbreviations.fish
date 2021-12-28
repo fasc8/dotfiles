@@ -49,6 +49,7 @@ abbr --add gru 'git remote update'
 
 # yadm shortcuts
 abbr --add ya 'yadm add'
+abbr --add yau 'yadm add -u'
 abbr --add yc 'yadm commit'
 abbr --add yd 'yadm diff'
 abbr --add yst 'yadm status'
