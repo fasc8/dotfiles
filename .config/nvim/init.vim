@@ -37,6 +37,8 @@ set redrawtime=10000 " Allow more time for loading syntax on large files
 " noinsert: Do not insert text until a selection is made
 " noselect: Do not select, force user to select one from the menu
 set completeopt=menuone,noinsert,noselect
+" Avoid showing extra messages when using completion
+set shortmess+=c
 " Better display for messages
 set cmdheight=2
 " Sane splits
@@ -187,7 +189,7 @@ source ~/.config/nvim/plugins/indentline.vim
 source ~/.config/nvim/plugins/rainbow.vim
 source ~/.config/nvim/plugins/better-whitespace.vim
 source ~/.config/nvim/plugins/lsp.vim
-source ~/.config/nvim/plugins/rust.vim
+source ~/.config/nvim/plugins/rust-tools.vim
 source ~/.config/nvim/plugins/lightline.vim
 
 call plug#end()
