@@ -198,3 +198,9 @@ doautocmd User PlugLoaded
 "--------------------------------------------------------------------------
 " remove trailing whitespaces
 command! FixWhitespace :%s/\s\+$//e
+
+" Unbind arrow keys
+noremap <Up> <Nop>
+noremap <Down> <Nop>
+noremap <Left> <Nop>
+noremap <Right> <Nop>
