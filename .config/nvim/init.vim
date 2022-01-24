@@ -191,6 +191,7 @@ source ~/.config/nvim/plugins/better-whitespace.vim
 source ~/.config/nvim/plugins/lsp.vim
 source ~/.config/nvim/plugins/rust-tools.vim
 source ~/.config/nvim/plugins/lightline.vim
+source ~/.config/nvim/plugins/vim-closer.vim
 
 call plug#end()
 doautocmd User PlugLoaded
