@@ -1,0 +1,17 @@
+dbus-update-activation-environment --all
+
+# delay exec after i3 start
+sleep 5 && {
+ VBoxClient-all
+ sleep 1
+ feh --bg-fill ~/Repos/bg.png
+ alacritty --title="metask" --command fish -c "while true; tmux; end" &
+ greenclip daemon &
+ picom --backend xrender &
+ ./.startup.sh
+} &
+
+xset r rate 300 40
+
+# start i3
+dbus-launch i3
