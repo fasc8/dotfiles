@@ -5,7 +5,7 @@ sleep 5 && {
  VBoxClient-all
  sleep 1
  feh --bg-fill ~/Repos/bg.png
- gnome-terminal --title="metask" --command fish -c "while true; tmux; end" &
+ gnome-terminal --title="metask" -- fish -c "while true; tmux; end" &
  greenclip daemon &
  picom --backend xrender &
  ./.startup.sh
