@@ -90,7 +90,7 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-bindsym $mod+h split h
+bindsym $mod+c split h
 
 # split in vertical orientation
 bindsym $mod+v split v
@@ -206,7 +206,7 @@ bar {
 for_window [class="Qalculate-gtk"] floating enable
 for_window [class="Qalculate-gtk"] resize set 810 640
 for_window [class="Qalculate-gtk"] move position center
-bindsym $mod+c exec qalculate-gtk
+bindsym $mod+q exec qalculate-gtk
 
 for_window [title="float_win"] floating enable
 for_window [title="float_win"] resize set 810 640
