@@ -5,15 +5,21 @@ Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/vim-vsnip'
+Plug 'jose-elias-alvarez/null-ls.nvim'
+
+" for better typescript support
+Plug 'nvim-lua/plenary.nvim'
+Plug 'jose-elias-alvarez/nvim-lsp-ts-utils'
 
 function LoadLsp()
 " Configure LSP through rust-tools.nvim plugin.
 " rust-tools will configure and enable certain LSP features for us.
 " See https://github.com/simrat39/rust-tools.nvim#configuration
 lua <<EOF
-local nvim_lsp = require'lspconfig'
+local lspconfig = require("lspconfig")
 
-local opts = {
+---- Rust-analyzer settings / setup
+local rust_opts = {
     tools = { -- rust-tools options
         autoSetHints = true,
         hover_with_actions = true,
@@ -42,9 +48,69 @@ local opts = {
         }
     },
 }
+require('rust-tools').setup(rust_opts)
+---- END
 
-require('rust-tools').setup(opts)
-nvim_lsp.pyright.setup{}
+---- Pyright setup
+lspconfig.pyright.setup{}
+---- END
+
+---- Javascript & Html setup
+local null_ls = require("null-ls")
+local buf_map = function(bufnr, mode, lhs, rhs, opts)
+    vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
+        silent = true,
+    })
+end
+local on_attach = function(client, bufnr)
+    vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
+    vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")
+    vim.cmd("command! LspCodeAction lua vim.lsp.buf.code_action()")
+    vim.cmd("command! LspHover lua vim.lsp.buf.hover()")
+    vim.cmd("command! LspRename lua vim.lsp.buf.rename()")
+    vim.cmd("command! LspRefs lua vim.lsp.buf.references()")
+    vim.cmd("command! LspTypeDef lua vim.lsp.buf.type_definition()")
+    vim.cmd("command! LspImplementation lua vim.lsp.buf.implementation()")
+    vim.cmd("command! LspDiagPrev lua vim.diagnostic.goto_prev()")
+    vim.cmd("command! LspDiagNext lua vim.diagnostic.goto_next()")
+    vim.cmd("command! LspDiagLine lua vim.diagnostic.open_float()")
+    vim.cmd("command! LspSignatureHelp lua vim.lsp.buf.signature_help()")
+    buf_map(bufnr, "n", "tgd", ":LspDef<CR>")
+    buf_map(bufnr, "n", "tgrn", ":LspRename<CR>")
+    buf_map(bufnr, "n", "t1gD", ":LspTypeDef<CR>")
+    buf_map(bufnr, "n", "tK", ":LspHover<CR>")
+    buf_map(bufnr, "n", "tg[", ":LspDiagPrev<CR>")
+    buf_map(bufnr, "n", "tg]", ":LspDiagNext<CR>")
+    buf_map(bufnr, "n", "tga", ":LspCodeAction<CR>")
+    buf_map(bufnr, "n", "<Leader>a", ":LspDiagLine<CR>")
+    buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>")
+    if client.resolved_capabilities.document_formatting then
+        vim.cmd("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()")
+    end
+end
+lspconfig.tsserver.setup({
+    on_attach = function(client, bufnr)
+        client.resolved_capabilities.document_formatting = false
+        client.resolved_capabilities.document_range_formatting = false
+        local ts_utils = require("nvim-lsp-ts-utils")
+        ts_utils.setup({})
+        ts_utils.setup_client(client)
+        buf_map(bufnr, "n", "tgs", ":TSLspOrganize<CR>")
+        buf_map(bufnr, "n", "tgi", ":TSLspRenameFile<CR>")
+        buf_map(bufnr, "n", "tgo", ":TSLspImportAll<CR>")
+        on_attach(client, bufnr)
+    end,
+})
+null_ls.setup({
+    sources = {
+        null_ls.builtins.diagnostics.eslint,
+        null_ls.builtins.code_actions.eslint,
+        null_ls.builtins.formatting.prettier,
+    },
+    on_attach = on_attach,
+})
+---- END
+
 EOF
 
 " Setup Completion
@@ -76,7 +142,7 @@ cmp.setup({
 
   -- Installed sources
   sources = {
-    { name = 'nvim_lsp' },
+    { name = 'lspconfig' },
     { name = 'vsnip' },
     { name = 'path' },
     { name = 'buffer' },
@@ -110,4 +176,3 @@ nnoremap <silent> g]    <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
 autocmd CursorHold *.rs,*.py lua vim.diagnostic.open_float(nil, { focusable = false })
 
 autocmd BufWritePre *.rs lua vim.lsp.buf.formatting_sync(nil, 200)
-
