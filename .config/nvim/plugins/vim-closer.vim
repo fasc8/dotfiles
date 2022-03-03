@@ -1,1 +1,0 @@
-Plug 'rstacruz/vim-closer'
