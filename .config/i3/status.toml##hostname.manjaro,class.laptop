@@ -28,28 +28,38 @@ format_mem = "{mem_used} ({mem_used_percents})"
 format_swap = "{swap_used}/{swap_total}({swap_used_percents})"
 
 [[block]]
-block = "cpu"
-interval = 1
-format = "{utilization}"
-
-[[block]]
 block = "load"
 interval = 1
 format = "{1m}"
 
 [[block]]
-block = "net"
-device = "ens33"
-interval = 5
-format = "{ip} {speed_down;K*b} {speed_up;K*b}"
+block = "cpu"
+interval = 1
+format = "{utilization}"
 
 [[block]]
-block = "battery"
-interval = 10
-format = "{percentage} {time}"
+block = "nvidia_gpu"
+label = " "
+show_memory = false
+show_clocks = false
+show_temperature = false
+interval = 1
+
+[[block]]
+block = "networkmanager"
+on_click = ""
+interface_name_exclude = ["br\\-[0-9a-f]{12}", "docker\\d+"]
+interface_name_include = []
+ap_format = ""
 
 [[block]]
 block = "time"
 interval = 1
 format = "%a %d/%m %R:%S"
 timezone = "Europe/Berlin"
+
+[[block]]
+block = "battery"
+interval = 10
+format = "{percentage} {time}"
+
