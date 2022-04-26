@@ -1,0 +1,65 @@
+theme = "slick"
+
+[icons]
+name = "awesome"
+
+[icons.overrides]
+cpu = "💤 "
+memory_mem = "📦"
+net_up = "📤"
+net_down = "📥"
+time = "🕑"
+cogs = "⚙️ "
+net_wired = "🌎"
+disk_drive = "💾"
+
+[[block]]
+block = "disk_space"
+path = "/"
+info_type = "available"
+format = "{icon}{available}"
+unit = "GB"
+interval = 20
+
+[[block]]
+block = "memory"
+display_type = "memory"
+format_mem = "{mem_used} ({mem_used_percents})"
+format_swap = "{swap_used}/{swap_total}({swap_used_percents})"
+
+[[block]]
+block = "load"
+interval = 1
+format = "{1m}"
+
+[[block]]
+block = "cpu"
+interval = 1
+format = "{utilization}"
+
+[[block]]
+block = "nvidia_gpu"
+label = " "
+show_memory = false
+show_clocks = false
+show_temperature = false
+interval = 1
+
+[[block]]
+block = "networkmanager"
+on_click = ""
+interface_name_exclude = ["br\\-[0-9a-f]{12}", "docker\\d+"]
+interface_name_include = []
+ap_format = ""
+
+[[block]]
+block = "time"
+interval = 1
+format = "%a %d/%m %R:%S"
+timezone = "Europe/Berlin"
+
+[[block]]
+block = "battery"
+interval = 10
+format = "{percentage} {time}"
+
