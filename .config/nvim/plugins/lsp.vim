@@ -183,8 +183,8 @@ nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
 nnoremap <silent> ga    <cmd>lua vim.lsp.buf.code_action()<CR>
 nnoremap <silent> cf    <cmd>ccl<CR>
 " Goto previous/next diagnostic warning/error
-nnoremap <silent> g[    <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
-nnoremap <silent> g]    <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+nnoremap <silent> g[    <cmd>lua vim.diagnostic.goto_prev()<CR>
+nnoremap <silent> g]    <cmd>lua vim.diagnostic.goto_next()<CR>
 
 " Show diagnostic popup on cursor hold
 autocmd CursorHold *.rs,*.py lua vim.diagnostic.open_float(nil, { focusable = false })
