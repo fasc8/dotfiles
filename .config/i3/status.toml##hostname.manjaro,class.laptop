@@ -38,14 +38,6 @@ interval = 1
 format = "{utilization}"
 
 [[block]]
-block = "nvidia_gpu"
-label = " "
-show_memory = false
-show_clocks = false
-show_temperature = false
-interval = 1
-
-[[block]]
 block = "networkmanager"
 on_click = ""
 interface_name_exclude = ["br\\-[0-9a-f]{12}", "docker\\d+"]
