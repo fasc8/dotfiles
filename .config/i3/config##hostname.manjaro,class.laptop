@@ -205,10 +205,10 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock -c 101010
 
 
 
-for_window [class="Qalculate-gtk"] floating enable
-for_window [class="Qalculate-gtk"] resize set 810 640
-for_window [class="Qalculate-gtk"] move position center
-bindsym $mod+q exec qalculate-gtk
+for_window [class="Galculator"] floating enable
+for_window [class="Galculator"] resize set 810 640
+for_window [class="Galculator"] move position center
+bindsym $mod+q exec galculator
 
 for_window [title="float_win"] floating enable
 for_window [title="float_win"] resize set 810 640
