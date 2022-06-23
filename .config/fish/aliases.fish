@@ -1,6 +1,9 @@
 # Base aliases
-alias vi "nvim"
-alias vim "nvim"
+if type -q nvim
+    alias vi "nvim"
+    alias vim "nvim"
+    alias nv "nvim"
+end
 
 if type -q bat
     alias cat "bat"
