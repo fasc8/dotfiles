@@ -163,7 +163,6 @@ source ~/.config/nvim/plugins/commentary.vim
 source ~/.config/nvim/plugins/dracula.vim
 source ~/.config/nvim/plugins/eunuch.vim
 source ~/.config/nvim/plugins/floaterm.vim
-source ~/.config/nvim/plugins/fzf.vim
 source ~/.config/nvim/plugins/heritage.vim
 source ~/.config/nvim/plugins/lastplace.vim
 source ~/.config/nvim/plugins/lion.vim
@@ -191,6 +190,7 @@ source ~/.config/nvim/plugins/better-whitespace.vim
 source ~/.config/nvim/plugins/lsp.vim
 source ~/.config/nvim/plugins/rust-tools.vim
 source ~/.config/nvim/plugins/lightline.vim
+source ~/.config/nvim/plugins/fzf.vim
 
 call plug#end()
 doautocmd User PlugLoaded
