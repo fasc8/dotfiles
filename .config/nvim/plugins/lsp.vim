@@ -118,6 +118,10 @@ null_ls.setup({
 })
 ---- END
 
+---- Svelte
+require'lspconfig'.svelte.setup{}
+---- END
+
 ---- clangd (c, c++) support
 require'lspconfig'.clangd.setup{
     capabilities = capabilities
