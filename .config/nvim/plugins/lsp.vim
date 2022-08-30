@@ -26,10 +26,10 @@ capabilities = cmp_nvim_lsp.update_capabilities(capabilities)
 
 
 ---- Rust-analyzer settings / setup
+local rt = require("rust-tools")
 local rust_opts = {
     tools = { -- rust-tools options
         autoSetHints = true,
-        hover_with_actions = true,
         inlay_hints = {
             show_parameter_hints = false,
             parameter_hints_prefix = "",
@@ -42,7 +42,12 @@ local rust_opts = {
     -- see https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#rust_analyzer
     server = {
         -- on_attach is a callback called when the language server attachs to the buffer
-        -- on_attach = on_attach,
+        on_attach = function(_, bufnr)
+            -- Hover action
+            vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+            -- Code action groups
+            vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+        end,
         settings = {
             -- to enable rust-analyzer settings visit:
             -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
@@ -55,7 +60,7 @@ local rust_opts = {
         }
     },
 }
-require('rust-tools').setup(rust_opts)
+rt.setup(rust_opts)
 ---- END
 
 ---- Pyright setup
@@ -64,37 +69,13 @@ lspconfig.pyright.setup{}
 
 ---- Javascript & Html setup
 local null_ls = require("null-ls")
+
 local buf_map = function(bufnr, mode, lhs, rhs, opts)
     vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
         silent = true,
     })
 end
-local on_attach = function(client, bufnr)
-    --vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
-    --vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")
-    --vim.cmd("command! LspCodeAction lua vim.lsp.buf.code_action()")
-    --vim.cmd("command! LspHover lua vim.lsp.buf.hover()")
-    --vim.cmd("command! LspRename lua vim.lsp.buf.rename()")
-    --vim.cmd("command! LspRefs lua vim.lsp.buf.references()")
-    --vim.cmd("command! LspTypeDef lua vim.lsp.buf.type_definition()")
-    --vim.cmd("command! LspImplementation lua vim.lsp.buf.implementation()")
-    --vim.cmd("command! LspDiagPrev lua vim.diagnostic.goto_prev()")
-    --vim.cmd("command! LspDiagNext lua vim.diagnostic.goto_next()")
-    --vim.cmd("command! LspDiagLine lua vim.diagnostic.open_float()")
-    --vim.cmd("command! LspSignatureHelp lua vim.lsp.buf.signature_help()")
-    --buf_map(bufnr, "n", "tgd", ":LspDef<CR>")
-    --buf_map(bufnr, "n", "tgrn", ":LspRename<CR>")
-    --buf_map(bufnr, "n", "t1gD", ":LspTypeDef<CR>")
-    --buf_map(bufnr, "n", "tK", ":LspHover<CR>")
-    --buf_map(bufnr, "n", "tg[", ":LspDiagPrev<CR>")
-    --buf_map(bufnr, "n", "tg]", ":LspDiagNext<CR>")
-    --buf_map(bufnr, "n", "tga", ":LspCodeAction<CR>")
-    --buf_map(bufnr, "n", "<Leader>a", ":LspDiagLine<CR>")
-    --buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>")
-    if client.resolved_capabilities.document_formatting then
-        vim.cmd("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()")
-    end
-end
+
 lspconfig.tsserver.setup({
     on_attach = function(client, bufnr)
         client.resolved_capabilities.document_formatting = false
@@ -108,13 +89,39 @@ lspconfig.tsserver.setup({
         on_attach(client, bufnr)
     end,
 })
+
 null_ls.setup({
     sources = {
         null_ls.builtins.diagnostics.eslint,
         null_ls.builtins.code_actions.eslint,
         null_ls.builtins.formatting.prettier,
     },
-    on_attach = on_attach,
+    on_attach = function(client, bufnr)
+        --vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
+        --vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")
+        --vim.cmd("command! LspCodeAction lua vim.lsp.buf.code_action()")
+        --vim.cmd("command! LspHover lua vim.lsp.buf.hover()")
+        --vim.cmd("command! LspRename lua vim.lsp.buf.rename()")
+        --vim.cmd("command! LspRefs lua vim.lsp.buf.references()")
+        --vim.cmd("command! LspTypeDef lua vim.lsp.buf.type_definition()")
+        --vim.cmd("command! LspImplementation lua vim.lsp.buf.implementation()")
+        --vim.cmd("command! LspDiagPrev lua vim.diagnostic.goto_prev()")
+        --vim.cmd("command! LspDiagNext lua vim.diagnostic.goto_next()")
+        --vim.cmd("command! LspDiagLine lua vim.diagnostic.open_float()")
+        --vim.cmd("command! LspSignatureHelp lua vim.lsp.buf.signature_help()")
+        --buf_map(bufnr, "n", "tgd", ":LspDef<CR>")
+        --buf_map(bufnr, "n", "tgrn", ":LspRename<CR>")
+        --buf_map(bufnr, "n", "t1gD", ":LspTypeDef<CR>")
+        --buf_map(bufnr, "n", "tK", ":LspHover<CR>")
+        --buf_map(bufnr, "n", "tg[", ":LspDiagPrev<CR>")
+        --buf_map(bufnr, "n", "tg]", ":LspDiagNext<CR>")
+        --buf_map(bufnr, "n", "tga", ":LspCodeAction<CR>")
+        --buf_map(bufnr, "n", "<Leader>a", ":LspDiagLine<CR>")
+        --buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>")
+        if client.resolved_capabilities.document_formatting then
+            vim.cmd("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()")
+        end
+    end,
 })
 ---- END
 
