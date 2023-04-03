@@ -24,7 +24,7 @@ interval = 20
 
 [[block]]
 block = "memory"
-format = " $mem_used ($mem_used_percents) "
+format = " $icon $mem_used ($mem_used_percents) "
 format_alt = " $swap_used/$swap_total($swap_used_percents) "
 interval = 30
 warning_mem = 70
@@ -33,21 +33,21 @@ critical_mem = 90
 [[block]]
 block = "cpu"
 interval = 1
-format = " $utilization "
+format = " $icon $utilization "
 
 [[block]]
 block = "load"
 interval = 1
-format = " $1m "
+format = " $icon $1m.eng(w:4) "
 
 [[block]]
 block = "net"
 device = "ens33"
 interval = 5
-format = " $ip $speed_down.eng(prefix:K) $speed_up.eng(prefix:K) "
+format = " $icon $ip ^icon_net_down $speed_down.eng(prefix:K) ^icon_net_up $speed_up.eng(prefix:K) "
 
 [[block]]
 block = "time"
 interval = 1
-format = " $timestamp.datetime(f:'%a %d/%m %R:%S', l:de_DE) "
+format = " $icon $timestamp.datetime(f:'%a %d/%m %R:%S', l:de_DE) "
 timezone = "Europe/Berlin"
