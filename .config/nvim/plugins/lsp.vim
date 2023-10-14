@@ -114,7 +114,7 @@ null_ls.setup({
         --buf_map(bufnr, "n", "<Leader>a", ":LspDiagLine<CR>")
         --buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>")
         if client.server_capabilities.documentFormattingProvider then
-            vim.cmd("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()")
+            vim.cmd("autocmd BufWritePre <buffer> lua vim.lsp.buf.format()")
         end
     end,
 })
