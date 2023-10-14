@@ -1,10 +1,11 @@
+[theme]
 theme = "slick"
 
 [icons]
-name = "awesome"
+icons = "awesome5"
 
 [icons.overrides]
-cpu = "💤 "
+cpu = "💤"
 memory_mem = "📦"
 net_up = "📤"
 net_down = "📥"
@@ -17,41 +18,42 @@ disk_drive = "💾"
 block = "disk_space"
 path = "/"
 info_type = "available"
-format = "{icon}{available}"
-unit = "GB"
+format = " $icon $available "
+alert_unit = "GB"
 interval = 20
 
 [[block]]
 block = "memory"
-display_type = "memory"
-format_mem = "{mem_used} ({mem_used_percents})"
-format_swap = "{swap_used}/{swap_total}({swap_used_percents})"
-
-[[block]]
-block = "load"
-interval = 1
-format = "{1m}"
+format = " $icon $mem_used ($mem_used_percents) "
+format_alt = " $swap_used/$swap_total($swap_used_percents) "
+interval = 30
+warning_mem = 70
+critical_mem = 90
 
 [[block]]
 block = "cpu"
 interval = 1
-format = "{utilization}"
+format = " $icon $utilization "
 
 [[block]]
-block = "networkmanager"
-on_click = ""
-interface_name_exclude = ["br\\-[0-9a-f]{12}", "docker\\d+"]
-interface_name_include = []
-ap_format = ""
+block = "load"
+interval = 1
+format = " $icon $1m.eng(w:4) "
+
+[[block]]
+block = "net"
+device = "wlp0s20f3"
+interval = 5
+format = " $icon $ip ^icon_net_down$speed_down.eng(prefix:K) ^icon_net_up$speed_up.eng(prefix:K) "
 
 [[block]]
 block = "time"
 interval = 1
-format = "%a %d/%m %R:%S"
+format = " $icon $timestamp.datetime(f:'%a %d/%m %R:%S', l:en_US) "
 timezone = "Europe/Berlin"
 
 [[block]]
 block = "battery"
 interval = 10
-format = "{percentage} {time}"
+format = " $icon $percentage $time "
 
