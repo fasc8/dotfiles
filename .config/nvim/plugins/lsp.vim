@@ -59,7 +59,22 @@ rt.setup(rust_opts)
 ---- END
 
 ---- Pyright setup
-lspconfig.pyright.setup{}
+lspconfig.pyright.setup{
+    on_attach = on_attach,
+    settings = {
+        pyright = {
+            autoImportCompletion = true,
+        },
+        python = {
+            analysis = {
+                autoSearchPaths = true,
+                diagnosticMode = "workspace",
+                useLibraryCodeForTypes = true,
+                typeCheckingMode = "off",
+            },
+        },
+    },
+}
 ---- END
 
 ---- Javascript & Html setup
@@ -113,9 +128,6 @@ null_ls.setup({
         --buf_map(bufnr, "n", "tga", ":LspCodeAction<CR>")
         --buf_map(bufnr, "n", "<Leader>a", ":LspDiagLine<CR>")
         --buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>")
-        if client.server_capabilities.documentFormattingProvider then
-            vim.cmd("autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()")
-        end
     end,
 })
 ---- END
