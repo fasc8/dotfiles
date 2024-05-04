@@ -211,3 +211,7 @@ bindsym $mod+q exec qalculate-gtk
 for_window [title="float_win"] floating enable
 for_window [title="float_win"] resize set 810 640
 for_window [title="float_win"] move position center
+
+for_window [title="PiFrame"] floating enable
+for_window [title="PiFrame"] resize set 800 600
+for_window [title="PiFrame"] move position center
