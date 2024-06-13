@@ -84,8 +84,3 @@ abbr --add j 'jobs -l'
 # Get web server headers
 abbr --add header 'curl -I'
 
-# Override old binaries with the newer ones
-abbr --add find 'fd'
-abbr --add grep 'rg'
-abbr --add curl 'http'
-
