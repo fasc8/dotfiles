@@ -1,0 +1,131 @@
+    "vim.easymotion": true,
+    "vim.incsearch": true,
+    "vim.useSystemClipboard": true,
+    "vim.useCtrlKeys": true,
+    "vim.hlsearch": true,
+    "vim.mouseSelectionGoesIntoVisualMode": true,
+    "vim.ignorecase": true,
+    "vim.insertModeKeyBindings": [
+        {
+        "before": ["j", "j"],
+        "after": ["<Esc>"]
+        }
+    ],
+    "vim.leader": "<space>",
+    "vim.handleKeys": {
+        "<C-a>": false,
+        "<C-f>": false
+    },
+    "extensions.experimental.affinity": {
+        "vscodevim.vim": 1
+    },
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+        "before": ["<leader>", "k"],
+        "commands": [":nohlsearch"]
+        },
+        {
+        "before": ["Y"],
+        "after": ["y", "$"]
+        },
+        {
+        "before": ["n"],
+        "after": ["n", "z", "z"]
+        },
+        {
+        "before": ["N"],
+        "after": ["N", "z", "z"]
+        },
+        {
+        "before": ["*"],
+        "after": ["*", "z", "z"]
+        },
+        {
+        "before": ["#"],
+        "after": ["#", "z", "z"]
+        },
+        {
+        "before": ["g", "*"],
+        "after": ["g", "*", "z", "z"]
+        },
+        {
+        "before": ["<leader>", "w"],
+        "commands": [":w<CR>"]
+        },
+        {
+        "before": ["?"],
+        "after": ["?", "\\v"]
+        },
+        {
+        "before": ["/"],
+        "after": ["/", "\\v"]
+        },
+        {
+        "before": ["H"],
+        "after": ["^"]
+        },
+        {
+        "before": ["L"],
+        "after": ["$"]
+        },
+        {
+        "before": ["<leader>", "h"],
+        "commands": [":split"]
+        },
+        {
+        "before": ["<leader>", "v"],
+        "commands": [":vsplit"]
+        },
+        {
+        "before": ["<leader>", "<left>"],
+        "commands": [":bp"]
+        },
+        {
+        "before": ["<leader>", "<right>"],
+        "commands": [":bn"]
+        },
+        {
+        "before": ["<leader>", "c"],
+        "commands": [":bd"]
+        },
+        {
+        "before": ["<C-j>"],
+        "after": ["<C-w>", "j"]
+        },
+        {
+        "before": ["<C-k>"],
+        "after": ["<C-w>", "k"]
+        },
+        {
+        "before": ["<C-l>"],
+        "after": ["<C-w>", "l"]
+        },
+        {
+        "before": ["<C-h>"],
+        "after": ["<C-w>", "h"]
+        },
+    ],
+    "vim.visualModeKeyBindingsNonRecursive": [
+        {
+        "before": ["H"],
+        "after": ["^"]
+        },
+        {
+        "before": ["L"],
+        "after": ["$"]
+        },
+        {
+            "before": ["<"],
+            "after": ["<", "g", "v"]
+        },
+        {
+            "before": [">"],
+            "after": [">", "g", "v"]
+        },
+    ],
+    "vim.commandLineModeKeyBindingsNonRecursive": [
+        {
+            "before": ["%", "s"],
+            "after": ["%", "s", "/"]
+        }
+    ]
