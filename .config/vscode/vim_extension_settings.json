@@ -1,3 +1,4 @@
+{
     "vim.easymotion": true,
     "vim.incsearch": true,
     "vim.useSystemClipboard": true,
@@ -20,6 +21,14 @@
         "vscodevim.vim": 1
     },
     "vim.normalModeKeyBindingsNonRecursive": [
+        {
+        "before": ["k"],
+        "after": ["g", "k"]
+        },
+        {
+        "before": ["j"],
+        "after": ["g", "j"]
+        },
         {
         "before": ["<leader>", "k"],
         "commands": [":nohlsearch"]
@@ -124,8 +133,14 @@
         },
     ],
     "vim.commandLineModeKeyBindingsNonRecursive": [
-        {
+       {
             "before": ["%", "s"],
             "after": ["%", "s", "/"]
         }
-    ]
+    ],
+    "vim.highlightedyank.enable": true,
+    "vim.history": 1000,
+    "vim.smartRelativeLine": true,
+    "vim.sneak": true
+}
+
