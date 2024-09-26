@@ -5,11 +5,13 @@ Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/vim-vsnip'
+Plug 'mfussenegger/nvim-dap'
 Plug 'jose-elias-alvarez/null-ls.nvim'
 
 " for better typescript support
 Plug 'nvim-lua/plenary.nvim'
 Plug 'jose-elias-alvarez/nvim-lsp-ts-utils'
+
 
 function LoadLsp()
 " Configure LSP through rust-tools.nvim plugin.
@@ -23,40 +25,6 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
 ---- END
 
-
-
----- Rust-analyzer settings / setup
-local rt = require("rust-tools")
-local rust_opts = {
-    tools = { -- rust-tools options
-        autoSetHints = true,
-        inlay_hints = {
-            show_parameter_hints = false,
-            parameter_hints_prefix = "",
-            other_hints_prefix = "",
-        },
-    },
-
-    -- all the opts to send to nvim-lspconfig
-    -- these override the defaults set by rust-tools.nvim
-    -- see https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#rust_analyzer
-    server = {
-        -- on_attach is a callback called when the language server attachs to the buffer
-        -- on_attach = on_attach,
-        settings = {
-            -- to enable rust-analyzer settings visit:
-            -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
-            ["rust-analyzer"] = {
-                -- enable clippy on save
-                checkOnSave = {
-                    command = "clippy"
-                },
-            }
-        }
-    },
-}
-rt.setup(rust_opts)
----- END
 
 ---- Pyright setup
 lspconfig.pyright.setup{
@@ -77,71 +45,76 @@ lspconfig.pyright.setup{
 }
 ---- END
 
----- Javascript & Html setup
-local null_ls = require("null-ls")
-
-local buf_map = function(bufnr, mode, lhs, rhs, opts)
-    vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
-        silent = true,
-    })
-end
-
-lspconfig.tsserver.setup({
-    on_attach = function(client, bufnr)
-        client.server_capabilities.documentFormattingProvider = false
-        client.server_capabilities.documentRangeFormattingProvider = false
-        local ts_utils = require("nvim-lsp-ts-utils")
-        ts_utils.setup({})
-        ts_utils.setup_client(client)
-        buf_map(bufnr, "n", "tgs", ":TSLspOrganize<CR>")
-        buf_map(bufnr, "n", "tgi", ":TSLspRenameFile<CR>")
-        buf_map(bufnr, "n", "tgo", ":TSLspImportAll<CR>")
-        on_attach(client, bufnr)
-    end,
-})
-
-null_ls.setup({
-    sources = {
-        null_ls.builtins.diagnostics.eslint,
-        null_ls.builtins.code_actions.eslint,
-        null_ls.builtins.formatting.prettier,
-    },
-    on_attach = function(client, bufnr)
-        --vim.cmd("command! LspDef lua vim.lsp.buf.definition()")
-        --vim.cmd("command! LspFormatting lua vim.lsp.buf.formatting()")
-        --vim.cmd("command! LspCodeAction lua vim.lsp.buf.code_action()")
-        --vim.cmd("command! LspHover lua vim.lsp.buf.hover()")
-        --vim.cmd("command! LspRename lua vim.lsp.buf.rename()")
-        --vim.cmd("command! LspRefs lua vim.lsp.buf.references()")
-        --vim.cmd("command! LspTypeDef lua vim.lsp.buf.type_definition()")
-        --vim.cmd("command! LspImplementation lua vim.lsp.buf.implementation()")
-        --vim.cmd("command! LspDiagPrev lua vim.diagnostic.goto_prev()")
-        --vim.cmd("command! LspDiagNext lua vim.diagnostic.goto_next()")
-        --vim.cmd("command! LspDiagLine lua vim.diagnostic.open_float()")
-        --vim.cmd("command! LspSignatureHelp lua vim.lsp.buf.signature_help()")
-        --buf_map(bufnr, "n", "tgd", ":LspDef<CR>")
-        --buf_map(bufnr, "n", "tgrn", ":LspRename<CR>")
-        --buf_map(bufnr, "n", "t1gD", ":LspTypeDef<CR>")
-        --buf_map(bufnr, "n", "tK", ":LspHover<CR>")
-        --buf_map(bufnr, "n", "tg[", ":LspDiagPrev<CR>")
-        --buf_map(bufnr, "n", "tg]", ":LspDiagNext<CR>")
-        --buf_map(bufnr, "n", "tga", ":LspCodeAction<CR>")
-        --buf_map(bufnr, "n", "<Leader>a", ":LspDiagLine<CR>")
-        --buf_map(bufnr, "i", "<C-x><C-x>", "<cmd> LspSignatureHelp<CR>")
-    end,
-})
----- END
-
----- Svelte
-require'lspconfig'.svelte.setup{}
----- END
-
 ---- clangd (c, c++) support
 require'lspconfig'.clangd.setup{
     capabilities = capabilities
 }
 ---- END
 
+-- Format on save. Currently only for rust files
+-- START COPYPASTA https://github.com/neovim/neovim/commit/5b04e46d23b65413d934d812d61d8720b815eb1c
+local util = require 'vim.lsp.util'
+vim.lsp.buf.format = function(options)
+  options = options or {}
+  local bufnr = options.bufnr or vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.buf_get_clients(bufnr)
+
+  if options.filter then
+    clients = options.filter(clients)
+  elseif options.id then
+    clients = vim.tbl_filter(
+      function(client) return client.id == options.id end,
+      clients
+    )
+  elseif options.name then
+    clients = vim.tbl_filter(
+      function(client) return client.name == options.name end,
+      clients
+    )
+  end
+
+  clients = vim.tbl_filter(
+    function(client) return client.supports_method 'textDocument/formatting' end,
+    clients
+  )
+
+  if #clients == 0 then
+    vim.notify '[LSP] Format request failed, no matching language servers.'
+  end
+
+  local timeout_ms = options.timeout_ms or 1000
+  for _, client in pairs(clients) do
+    local params = util.make_formatting_params(options.formatting_options)
+    local result, err = client.request_sync('textDocument/formatting', params, timeout_ms, bufnr)
+    if result and result.result then
+      util.apply_text_edits(result.result, bufnr, client.offset_encoding)
+    elseif err then
+      vim.notify(string.format('[LSP][%s] %s', client.name, err), vim.log.levels.WARN)
+    end
+  end
+end
+
+-- END COPYPASTA
+EOF
+
+lua <<EOF
+vim.api.nvim_create_augroup('LspFormatting', { clear = true })
+vim.api.nvim_create_autocmd('BufWritePre', {
+  pattern = '*.rs',
+  group = 'LspFormatting',
+  callback = function()
+    vim.lsp.buf.format {
+      timeout_ms = 2000,
+      filter = function(clients)
+        return vim.tbl_filter(function(client)
+          return pcall(function(_client)
+            return _client.config.settings.autoFixOnSave or false
+          end, client) or false
+        end, clients)
+      end
+    }
+  end
+})
 EOF
 
 " Setup Completion
@@ -206,5 +179,3 @@ nnoremap <silent> g]    <cmd>lua vim.diagnostic.goto_next()<CR>
 
 " Show diagnostic popup on cursor hold
 autocmd CursorHold *.rs,*.py lua vim.diagnostic.open_float(nil, { focusable = false })
-
-autocmd BufWritePre *.rs lua vim.lsp.buf.formatting_sync(nil, 200)

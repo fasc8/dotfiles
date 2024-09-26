@@ -187,7 +187,7 @@ source ~/.config/nvim/plugins/indentline.vim
 source ~/.config/nvim/plugins/rainbow.vim
 source ~/.config/nvim/plugins/better-whitespace.vim
 source ~/.config/nvim/plugins/lsp.vim
-source ~/.config/nvim/plugins/rust-tools.vim
+source ~/.config/nvim/plugins/rustaceanvim.vim
 source ~/.config/nvim/plugins/lightline.vim
 source ~/.config/nvim/plugins/fzf.vim
 
