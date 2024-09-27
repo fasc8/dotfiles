@@ -1,0 +1,2 @@
+Plug 'mrcjkb/rustaceanvim'
+
