@@ -6,12 +6,6 @@ Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/vim-vsnip'
 Plug 'mfussenegger/nvim-dap'
-Plug 'jose-elias-alvarez/null-ls.nvim'
-
-" for better typescript support
-Plug 'nvim-lua/plenary.nvim'
-Plug 'jose-elias-alvarez/nvim-lsp-ts-utils'
-
 
 function LoadLsp()
 " Configure LSP through rust-tools.nvim plugin.
@@ -24,6 +18,9 @@ local cmp_nvim_lsp = require("cmp_nvim_lsp")
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
 ---- END
+---- Inlay hints
+vim.lsp.inlay_hint.enable()
+----
 
 
 ---- Pyright setup
