@@ -19,7 +19,9 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
 ---- END
 ---- Inlay hints
-vim.lsp.inlay_hint.enable()
+if vim.lsp.inlay_hint then
+  vim.lsp.inlay_hint.enable(true, { 0 })
+end
 ----
 
 

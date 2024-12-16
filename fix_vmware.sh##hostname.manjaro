@@ -1,7 +1,0 @@
-#!/bin/bash
-
-pacman -Syu
-pacman -S gtk2 gtkmm gtkmm3 xf86-input-vmmouse xf86-video-vmware open-vm-tools
-systemctl enable vmtoolsd
-sed -i 's/MODULES=""/MODULES="vsock vmw_vsock_vmci_transport vmw_balloon vmw_vmci vmwgfx"/g' /etc/mkinitcpio.conf
-mkinitcpio -P
