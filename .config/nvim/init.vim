@@ -200,7 +200,8 @@ doautocmd User PlugLoaded
 " remove trailing whitespaces
 command! FixWhitespace :%s/\s\+$//e
 " adjust markdown table
-command! -range -nargs=0 MarkdownTableFix :!tr -s " " | column -t -s '|' -o '|'
+command! -range -nargs=0 MarkdownTableFix :! tr -s " " | column -t -s '|' -o '|'
+
 " Unbind arrow keys
 noremap <Up> <Nop>
 noremap <Down> <Nop>
