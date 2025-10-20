@@ -35,6 +35,7 @@ abbr --add gcp 'git cherry-pick'
 abbr --add gcs 'git commit -sS'
 abbr --add gd 'git diff'
 abbr --add gfp 'git fetch --prune'
+abbr --add gfap 'git fetch --all --prune'
 abbr --add gi 'git ignore'
 abbr --add gl "git log --pretty='format:%C(Yellow)%h%Creset %C(Blue)%ar%Creset %an - %s' --graph"
 abbr --add gm 'git merge --no-ff'
