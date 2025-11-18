@@ -57,7 +57,7 @@ fi
 
 
 if [ $pck_mngr = "apt" ]; then
-  sudo apt install bat exa fd-find ripgrep fzf httpie
+  sudo apt install bat eza fd-find ripgrep fzf httpie
   sudo ln -s /usr/bin/fdfind /usr/bin/fd
   sudo ln -s /usr/bin/batcat /usr/bin/bat
 elif [ $pck_mngr = "pacman" ]; then
