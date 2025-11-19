@@ -54,6 +54,7 @@ vim.opt.splitbelow = true
 vim.opt.incsearch = true
 vim.opt.gdefault = true
 vim.opt.encoding = "utf-8"
+vim.opt.foldmethod = "manual"
 
 -- Normal mode keymaps
 vim.keymap.set("n", "<leader>ve", ":edit ~/.config/nvim/init.lua<CR>", { noremap = true, silent = true })
