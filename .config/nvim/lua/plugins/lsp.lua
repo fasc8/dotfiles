@@ -22,22 +22,36 @@ return {
       end
 
       -- Pyright and Ruff setup
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup('lsp_attach_disable_ruff_hover', { clear = true }),
-        callback = function(args)
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          if client and client.name == 'ruff' then
-            client.server_capabilities.hoverProvider = false
-          end
-        end,
-        desc = 'LSP: Disable hover capability from Ruff',
-      })
+      -- vim.api.nvim_create_autocmd("LspAttach", {
+      --   group = vim.api.nvim_create_augroup('lsp_attach_disable_ruff_hover', { clear = true }),
+      --   callback = function(args)
+      --     local client = vim.lsp.get_client_by_id(args.data.client_id)
+      --     if client and client.name == 'ruff' then
+      --       client.server_capabilities.hoverProvider = false
+      --     end
+      --   end,
+      --   desc = 'LSP: Disable hover capability from Ruff',
+      -- })
 
       -- Ruff setup
       vim.lsp.config('ruff', { })
-
       vim.lsp.enable('ruff')
 
+      vim.lsp.config('pyright', {
+        settings = {
+          pyright = {
+            -- Using Ruff's importer organizer
+            disableOrganizeImports = true,
+          },
+          python = {
+            analysis = {
+              -- ignoer all files for analysis to exclusively use Ruff
+              ignore = { '*' }
+            },
+          },
+        },
+      })
+      vim.lsp.enable('pyright')
     end,
   },
 
