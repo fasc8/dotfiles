@@ -51,3 +51,6 @@ else
     source $HOME/.config/fish/startx.fish &> /dev/null
 
 end
+
+# Created by `pipx` on 2025-11-22 19:07:33
+set PATH $PATH /home/fasc8/.local/bin
