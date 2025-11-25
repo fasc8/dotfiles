@@ -236,6 +236,31 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Functions for neo-tree
+local function on_move(args)
+    -- Define what should happen on file move/rename events
+    -- For example, refresh neo-tree or update UI
+    -- This is a placeholder; adjust as needed:
+    require("neo-tree.sources.filesystem").refresh()
+end
+
+local function get_root_dir()
+    local clients = vim.lsp.get_clients({ bufnr = 0 })
+    if #clients > 0 then
+        local root = clients[1].config.root_dir
+        if root then
+            return root
+        end
+    end
+    -- fallback to git root
+    local git_dir = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+    if git_dir ~= nil and git_dir ~= '' and vim.v.shell_error == 0 then
+        return git_dir
+    end
+    -- fallback to cwd
+    return vim.fn.getcwd()
+end
+
 -- load plugins in plugins dir
 require("lazy").setup({
    -- nice bar at the bottom
@@ -280,298 +305,298 @@ require("lazy").setup({
         end
     },
     -- quick navigation
-	{
-		'ggandor/leap.nvim',
-		config = function()
-			vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
-			vim.keymap.set('n',             'S', '<Plug>(leap-from-window)')
-		end
-	},
+    {
+        'ggandor/leap.nvim',
+        config = function()
+            vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
+            vim.keymap.set('n',             'S', '<Plug>(leap-from-window)')
+        end
+    },
     -- better %
-	{
-		'andymass/vim-matchup',
-		config = function()
-			vim.g.matchup_matchparen_offscreen = { method = "popup" }
-		end
-	},
+    {
+        'andymass/vim-matchup',
+        config = function()
+            vim.g.matchup_matchparen_offscreen = { method = "popup" }
+        end
+    },
     -- auto-cd to root of git project
-	{
-		'notjedi/nvim-rooter.lua',
-		config = function()
-			require('nvim-rooter').setup()
-		end
-	},
+    {
+        'notjedi/nvim-rooter.lua',
+        config = function()
+            require('nvim-rooter').setup()
+        end
+    },
     -- fzf support for ^p
-	{
-		'ibhagwan/fzf-lua',
-		config = function()
-			-- stop putting a giant window over my editor
-			require'fzf-lua'.setup{
-				winopts = {
-					split = "belowright 10new",
-					preview = {
-						hidden = true,
-					}
-				},
-				files = {
-					-- file icons are distracting
-					file_icons = false,
-					-- git icons are nice
-					git_icons = true,
-					-- but don't mess up my anchored search
-					_fzf_nth_devicons = true,
-				},
-				buffers = {
-					file_icons = false,
-					git_icons = true,
-					-- no nth_devicons as we'll do that
-					-- manually since we also use
-					-- with-nth
-				},
-				fzf_opts = {
-					-- no reverse view
-					["--layout"] = "default",
-				},
-			}
-			-- when using C-p for quick file open, pass the file list through
-			--
-			--   https://github.com/jonhoo/proximity-sort
-			--
-			-- to prefer files closer to the current file.
-			vim.keymap.set('', '<C-p>', function()
-				opts = {}
-				opts.cmd = 'fd --color=never --hidden --type f --type l --exclude .git'
-				local base = vim.fn.fnamemodify(vim.fn.expand('%'), ':h:.:S')
-				if base ~= '.' then
-					-- if there is no current file,
-					-- proximity-sort can't do its thing
-					opts.cmd = opts.cmd .. (" | proximity-sort %s"):format(vim.fn.shellescape(vim.fn.expand('%')))
-				end
-				opts.fzf_opts = {
-				  ['--scheme']    = 'path',
-				  ['--tiebreak']  = 'index',
-				  ["--layout"]    = "default",
-				}
-				require'fzf-lua'.files(opts)
-			end)
-			-- use fzf to search buffers as well
-			vim.keymap.set('n', '<leader>;', function()
-				require'fzf-lua'.buffers({
-					-- just include the paths in the fzf bits, and nothing else
-					-- https://github.com/ibhagwan/fzf-lua/issues/2230#issuecomment-3164258823
-					fzf_opts = {
-					  ["--with-nth"]      = "{-3..-2}",
-					  ["--nth"]           = "-1",
-					  ["--delimiter"]     = "[:\u{2002}]",
-					  ["--header-lines"]  = "false",
-					},
-					header = false,
-				})
-			end)
-		end
-	},
+    {
+        'ibhagwan/fzf-lua',
+        config = function()
+            -- stop putting a giant window over my editor
+            require'fzf-lua'.setup{
+                winopts = {
+                    split = "belowright 10new",
+                    preview = {
+                        hidden = true,
+                    }
+                },
+                files = {
+                    -- file icons are distracting
+                    file_icons = false,
+                    -- git icons are nice
+                    git_icons = true,
+                    -- but don't mess up my anchored search
+                    _fzf_nth_devicons = true,
+                },
+                buffers = {
+                    file_icons = false,
+                    git_icons = true,
+                    -- no nth_devicons as we'll do that
+                    -- manually since we also use
+                    -- with-nth
+                },
+                fzf_opts = {
+                    -- no reverse view
+                    ["--layout"] = "default",
+                },
+            }
+            -- when using C-p for quick file open, pass the file list through
+            --
+            --   https://github.com/jonhoo/proximity-sort
+            --
+            -- to prefer files closer to the current file.
+            vim.keymap.set('', '<C-p>', function()
+                opts = {}
+                opts.cmd = 'fd --color=never --hidden --type f --type l --exclude .git'
+                local base = vim.fn.fnamemodify(vim.fn.expand('%'), ':h:.:S')
+                if base ~= '.' then
+                    -- if there is no current file,
+                    -- proximity-sort can't do its thing
+                    opts.cmd = opts.cmd .. (" | proximity-sort %s"):format(vim.fn.shellescape(vim.fn.expand('%')))
+                end
+                opts.fzf_opts = {
+                  ['--scheme']    = 'path',
+                  ['--tiebreak']  = 'index',
+                  ["--layout"]    = "default",
+                }
+                require'fzf-lua'.files(opts)
+            end)
+            -- use fzf to search buffers as well
+            vim.keymap.set('n', '<leader>;', function()
+                require'fzf-lua'.buffers({
+                    -- just include the paths in the fzf bits, and nothing else
+                    -- https://github.com/ibhagwan/fzf-lua/issues/2230#issuecomment-3164258823
+                    fzf_opts = {
+                      ["--with-nth"]      = "{-3..-2}",
+                      ["--nth"]           = "-1",
+                      ["--delimiter"]     = "[:\u{2002}]",
+                      ["--header-lines"]  = "false",
+                    },
+                    header = false,
+                })
+            end)
+        end
+    },
     -- LSP
-	{
-		'neovim/nvim-lspconfig',
-		config = function()
-			-- Setup language servers.
+    {
+        'neovim/nvim-lspconfig',
+        config = function()
+            -- Setup language servers.
 
-			-- Rust
-			vim.lsp.config('rust_analyzer', {
-				-- Server-specific settings. See `:help lspconfig-setup`
-				settings = {
-					["rust-analyzer"] = {
-						cargo = {
-							features = "all",
-						},
-						checkOnSave = {
-							enable = true,
-						},
-						check = {
-							command = "clippy",
-						},
-						imports = {
-							group = {
-								enable = false,
-							},
-						},
-						completion = {
-							postfix = {
-								enable = false,
-							},
-						},
-					},
-				},
-			})
-			vim.lsp.enable('rust_analyzer')
+            -- Rust
+            vim.lsp.config('rust_analyzer', {
+                -- Server-specific settings. See `:help lspconfig-setup`
+                settings = {
+                    ["rust-analyzer"] = {
+                        cargo = {
+                            features = "all",
+                        },
+                        checkOnSave = {
+                            enable = true,
+                        },
+                        check = {
+                            command = "clippy",
+                        },
+                        imports = {
+                            group = {
+                                enable = false,
+                            },
+                        },
+                        completion = {
+                            postfix = {
+                                enable = false,
+                            },
+                        },
+                    },
+                },
+            })
+            vim.lsp.enable('rust_analyzer')
 
-			-- Bash LSP
-			if vim.fn.executable('bash-language-server') == 1 then
-				vim.lsp.enable('bashls')
-			end
+            -- Bash LSP
+            if vim.fn.executable('bash-language-server') == 1 then
+                vim.lsp.enable('bashls')
+            end
 
-			-- Ruff for Python
-			if vim.fn.executable('ruff') == 1 then
-				vim.lsp.enable('ruff')
-			end
+            -- Ruff for Python
+            if vim.fn.executable('ruff') == 1 then
+                vim.lsp.enable('ruff')
+            end
 
-			-- Global mappings.
-			-- See `:help vim.diagnostic.*` for documentation on any of the below functions
-			vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
-			vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-			vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-			vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
+            -- Global mappings.
+            -- See `:help vim.diagnostic.*` for documentation on any of the below functions
+            vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
+            vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+            vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+            vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
-			-- Use LspAttach autocommand to only map the following keys
-			-- after the language server attaches to the current buffer
-			vim.api.nvim_create_autocmd('LspAttach', {
-				group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-				callback = function(ev)
-					-- Enable completion triggered by <c-x><c-o>
-					vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+            -- Use LspAttach autocommand to only map the following keys
+            -- after the language server attaches to the current buffer
+            vim.api.nvim_create_autocmd('LspAttach', {
+                group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+                callback = function(ev)
+                    -- Enable completion triggered by <c-x><c-o>
+                    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-					-- Buffer local mappings.
-					-- See `:help vim.lsp.*` for documentation on any of the below functions
-					local opts = { buffer = ev.buf }
-					vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-					vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-					vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-					vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-					vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-					vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
-					vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
-					vim.keymap.set('n', '<leader>wl', function()
-						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-					end, opts)
-					--vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
-					vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, opts)
-					vim.keymap.set({ 'n', 'v' }, '<leader>a', vim.lsp.buf.code_action, opts)
-					vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-					vim.keymap.set('n', '<leader>f', function()
-						vim.lsp.buf.format { async = true }
-					end, opts)
+                    -- Buffer local mappings.
+                    -- See `:help vim.lsp.*` for documentation on any of the below functions
+                    local opts = { buffer = ev.buf }
+                    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+                    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+                    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+                    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+                    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+                    vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
+                    vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
+                    vim.keymap.set('n', '<leader>wl', function()
+                        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+                    end, opts)
+                    --vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
+                    vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, opts)
+                    vim.keymap.set({ 'n', 'v' }, '<leader>a', vim.lsp.buf.code_action, opts)
+                    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+                    vim.keymap.set('n', '<leader>f', function()
+                        vim.lsp.buf.format { async = true }
+                    end, opts)
 
-					local client = vim.lsp.get_client_by_id(ev.data.client_id)
+                    local client = vim.lsp.get_client_by_id(ev.data.client_id)
 
-					-- TODO: find some way to make this only apply to the current line.
-					if client.server_capabilities.inlayHintProvider then
-					    vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
-					end
+                    -- TODO: find some way to make this only apply to the current line.
+                    if client.server_capabilities.inlayHintProvider then
+                        vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
+                    end
 
-					-- None of this semantics tokens business.
-					-- https://www.reddit.com/r/neovim/comments/143efmd/is_it_possible_to_disable_treesitter_completely/
-					client.server_capabilities.semanticTokensProvider = nil
+                    -- None of this semantics tokens business.
+                    -- https://www.reddit.com/r/neovim/comments/143efmd/is_it_possible_to_disable_treesitter_completely/
+                    client.server_capabilities.semanticTokensProvider = nil
 
-					-- format on save for Rust
-					if client.server_capabilities.documentFormattingProvider then
-						vim.api.nvim_create_autocmd("BufWritePre", {
-							group = vim.api.nvim_create_augroup("RustFormat", { clear = true }),
-							buffer = bufnr,
-							callback = function()
-								vim.lsp.buf.format({ bufnr = bufnr })
-							end,
-						})
-					end
-				end,
-			})
-		end
-	},
-	-- LSP-based code-completion
-	{
-		"hrsh7th/nvim-cmp",
-		-- load cmp on InsertEnter
-		event = "InsertEnter",
-		-- these dependencies will only be loaded when cmp loads
-		-- dependencies are always lazy-loaded unless specified otherwise
-		dependencies = {
-			'neovim/nvim-lspconfig',
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-		},
-		config = function()
-			local cmp = require'cmp'
-			cmp.setup({
-				snippet = {
-					-- REQUIRED by nvim-cmp. get rid of it once we can
-					expand = function(args)
-						vim.snippet.expand(args.body)
-					end,
-				},
-				mapping = cmp.mapping.preset.insert({
-					['<C-b>'] = cmp.mapping.scroll_docs(-4),
-					['<C-f>'] = cmp.mapping.scroll_docs(4),
-					['<C-Space>'] = cmp.mapping.complete(),
-					['<C-e>'] = cmp.mapping.abort(),
-					-- Accept currently selected item.
-					-- Set `select` to `false` to only confirm explicitly selected items.
-					['<CR>'] = cmp.mapping.confirm({ select = true, behavior = cmp.ConfirmBehavior.Insert }),
-				}),
-				sources = cmp.config.sources({
-					{ name = 'nvim_lsp' },
-				}, {
-					{ name = 'path' },
-				}),
-				experimental = {
-					ghost_text = true,
-				},
-			})
+                    -- format on save for Rust
+                    if client.server_capabilities.documentFormattingProvider then
+                        vim.api.nvim_create_autocmd("BufWritePre", {
+                            group = vim.api.nvim_create_augroup("RustFormat", { clear = true }),
+                            buffer = bufnr,
+                            callback = function()
+                                vim.lsp.buf.format({ bufnr = bufnr })
+                            end,
+                        })
+                    end
+                end,
+            })
+        end
+    },
+    -- LSP-based code-completion
+    {
+        "hrsh7th/nvim-cmp",
+        -- load cmp on InsertEnter
+        event = "InsertEnter",
+        -- these dependencies will only be loaded when cmp loads
+        -- dependencies are always lazy-loaded unless specified otherwise
+        dependencies = {
+            'neovim/nvim-lspconfig',
+            "hrsh7th/cmp-nvim-lsp",
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
+        },
+        config = function()
+            local cmp = require'cmp'
+            cmp.setup({
+                snippet = {
+                    -- REQUIRED by nvim-cmp. get rid of it once we can
+                    expand = function(args)
+                        vim.snippet.expand(args.body)
+                    end,
+                },
+                mapping = cmp.mapping.preset.insert({
+                    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+                    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+                    ['<C-Space>'] = cmp.mapping.complete(),
+                    ['<C-e>'] = cmp.mapping.abort(),
+                    -- Accept currently selected item.
+                    -- Set `select` to `false` to only confirm explicitly selected items.
+                    ['<CR>'] = cmp.mapping.confirm({ select = true, behavior = cmp.ConfirmBehavior.Insert }),
+                }),
+                sources = cmp.config.sources({
+                    { name = 'nvim_lsp' },
+                }, {
+                    { name = 'path' },
+                }),
+                experimental = {
+                    ghost_text = true,
+                },
+            })
 
-			-- Enable completing paths in :
-			cmp.setup.cmdline(':', {
-				sources = cmp.config.sources({
-					{ name = 'path' }
-				})
-			})
-		end
-	},
+            -- Enable completing paths in :
+            cmp.setup.cmdline(':', {
+                sources = cmp.config.sources({
+                    { name = 'path' }
+                })
+            })
+        end
+    },
     -- inline function signatures
-	{
-		"ray-x/lsp_signature.nvim",
-		event = "VeryLazy",
-		opts = {},
-		config = function(_, opts)
-			-- Get signatures (and _only_ signatures) when in argument lists.
-			require "lsp_signature".setup({
-				doc_lines = 0,
-				handler_opts = {
-					border = "none"
-				},
-			})
-		end
-	},
+    {
+        "ray-x/lsp_signature.nvim",
+        event = "VeryLazy",
+        opts = {},
+        config = function(_, opts)
+            -- Get signatures (and _only_ signatures) when in argument lists.
+            require "lsp_signature".setup({
+                doc_lines = 0,
+                handler_opts = {
+                    border = "none"
+                },
+            })
+        end
+    },
     -- language support
-	-- toml
-	'cespare/vim-toml',
-	-- yaml
-	{
-		"cuducos/yaml.nvim",
-		ft = { "yaml" },
-		dependencies = {
-			"nvim-treesitter/nvim-treesitter",
-		},
-	},
+    -- toml
+    'cespare/vim-toml',
+    -- yaml
+    {
+        "cuducos/yaml.nvim",
+        ft = { "yaml" },
+        dependencies = {
+            "nvim-treesitter/nvim-treesitter",
+        },
+    },
     -- fish
-	'khaveesh/vim-fish-syntax',
-	-- markdown
-	{
-		'plasticboy/vim-markdown',
-		ft = { "markdown" },
-		dependencies = {
-			'godlygeek/tabular',
-		},
-		config = function()
-			-- never ever fold!
-			vim.g.vim_markdown_folding_disabled = 1
-			-- support front-matter in .md files
-			vim.g.vim_markdown_frontmatter = 1
-			-- 'o' on a list item should insert at same level
-			vim.g.vim_markdown_new_list_item_indent = 0
-			-- don't add bullets when wrapping:
-			-- https://github.com/preservim/vim-markdown/issues/232
-			vim.g.vim_markdown_auto_insert_bullets = 0
-		end
-	},
+    'khaveesh/vim-fish-syntax',
+    -- markdown
+    {
+        'plasticboy/vim-markdown',
+        ft = { "markdown" },
+        dependencies = {
+            'godlygeek/tabular',
+        },
+        config = function()
+            -- never ever fold!
+            vim.g.vim_markdown_folding_disabled = 1
+            -- support front-matter in .md files
+            vim.g.vim_markdown_frontmatter = 1
+            -- 'o' on a list item should insert at same level
+            vim.g.vim_markdown_new_list_item_indent = 0
+            -- don't add bullets when wrapping:
+            -- https://github.com/preservim/vim-markdown/issues/232
+            vim.g.vim_markdown_auto_insert_bullets = 0
+        end
+    },
     -- improve handling of white spaces
     {
         "ntpeters/vim-better-whitespace",
@@ -672,37 +697,37 @@ require("lazy").setup({
     -- use in Neovim to power faster and more accurate
     -- syntax highlighting.
     {
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		event = { "BufReadPost", "BufNewFile" },
-		cmd = { "TSUpdate", "TSInstall", "TSLog", "TSUninstall" },
-		opts = {
-			highlight = { enable = true },
-			indent = { enable = true },
-			ensure_installed = {
-				"bash",
-				"diff",
-				"html",
-				"javascript",
-				"lua",
-				"luadoc",
-				"luap",
-				"markdown",
-				"markdown_inline",
-				"python",
-				"regex",
-				"rust",
-				"toml",
-				"vim",
-				"vimdoc",
-				"xml",
-				"yaml",
-			},
-			autotag = { enable = true },
-		},
-		config = function(_, opts)
-			require("nvim-treesitter.configs").setup(opts)
-		end,
+        "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate",
+        event = { "BufReadPost", "BufNewFile" },
+        cmd = { "TSUpdate", "TSInstall", "TSLog", "TSUninstall" },
+        opts = {
+            highlight = { enable = true },
+            indent = { enable = true },
+            ensure_installed = {
+                "bash",
+                "diff",
+                "html",
+                "javascript",
+                "lua",
+                "luadoc",
+                "luap",
+                "markdown",
+                "markdown_inline",
+                "python",
+                "regex",
+                "rust",
+                "toml",
+                "vim",
+                "vimdoc",
+                "xml",
+                "yaml",
+            },
+            autotag = { enable = true },
+        },
+        config = function(_, opts)
+            require("nvim-treesitter.configs").setup(opts)
+        end,
     },
     {
     "nvim-treesitter/nvim-treesitter-textobjects",
@@ -732,6 +757,120 @@ require("lazy").setup({
         config = function()
             require("which-key").setup()
         end,
-    }
+    },
+    -- file tree
+    {
+        "nvim-neo-tree/neo-tree.nvim",
+        branch = "v3.x",
+        dependencies = {
+          "nvim-lua/plenary.nvim",
+          "MunifTanjim/nui.nvim",
+          "nvim-tree/nvim-web-devicons", -- optional, but recommended
+        },
+        cmd = "Neotree",
+        keys = {
+            {
+                "<leader>fe",
+                function()
+                    require("neo-tree.command").execute({ toggle = true, dir = get_root_dir() })
+                end,
+                desc = "Explorer NeoTree (Root Dir)",
+            },
+            {
+                "<leader>fE",
+                function()
+                  require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
+                end,
+                desc = "Explorer NeoTree (cwd)",
+            },
+            {
+                "<leader>ge",
+                function()
+                  require("neo-tree.command").execute({ source = "git_status", toggle = true })
+                end,
+                desc = "Git Explorer",
+            },
+            {
+                "<leader>be",
+                function()
+                  require("neo-tree.command").execute({ source = "buffers", toggle = true })
+                end,
+                desc = "Buffer Explorer",
+            },
+        },
+        -- lazy loading handled by cmd and keys, so no need to set lazy = false
+        init = function()
+            vim.api.nvim_create_autocmd("BufEnter", {
+                group = vim.api.nvim_create_augroup("Neotree_start_directory", { clear = true }),
+                desc = "Start Neo-tree with directory",
+                once = true,
+                callback = function()
+                    if package.loaded["neo-tree"] then
+                        return
+                    else
+                        local stats = vim.loop.fs_stat(vim.fn.argv(0))
+                        if stats and stats.type == "directory" then
+                            require("neo-tree")
+                        end
+                    end
+                end,
+            })
+        end,
+        ---@module 'neo-tree'
+        ---@type neotree.Config
+        opts = {
+            sources = { "filesystem", "buffers", "git_status" },
+            open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
+            filesystem = {
+                bind_to_cwd = false,
+                follow_current_file = { enabled = true },
+                use_libuv_file_watcher = true,
+                filtered_items = {
+                    visible = true, -- This is what you want: If you set this to `true`, all "hide" just mean "dimmed out"
+                    hide_dotfiles = false,
+                    hide_gitignored = true,
+                },
+            },
+            window = {
+                mappings = {
+                    ["l"] = "open",
+                    ["h"] = "close_node",
+                    ["<space>"] = "none",
+                    ["Y"] = {
+                        function(state)
+                            local node = state.tree:get_node()
+                            local path = node:get_id()
+                            vim.fn.setreg("+", path, "c")
+                        end,
+                        desc = "Copy Path to Clipboard",
+                    },
+                    ["O"] = {
+                        function(state)
+                            require("lazy.util").open(state.tree:get_node().path, { system = true })
+                        end,
+                        desc = "Open with System Application",
+                    },
+                    ["P"] = { "toggle_preview", config = { use_float = false } },
+                },
+            },
+            default_component_configs = {
+                indent = {
+                    with_expanders = true,
+                    expander_collapsed = "▹",
+                    expander_expanded = "▿",
+                    expander_highlight = "NeoTreeExpander",
+                },
+            },
+        },
+        config = function(_, opts)
+            local events = require("neo-tree.events")
+            opts.event_handlers = opts.event_handlers or {}
+            vim.list_extend(opts.event_handlers, {
+                { event = events.FILE_MOVED, handler = on_move },
+                { event = events.FILE_RENAMED, handler = on_move },
+            })
+            require("neo-tree").setup(opts)
+        end,
+    },
 })
 
