@@ -19,6 +19,7 @@ abbr --add y 'yadm'
 # Git shortcuts
 abbr --add ga 'git add'
 abbr --add gaa 'git add .'
+abbr --add gah 'git stash; and git pull --rebase; and git stash pop'
 abbr --add gb 'git branch'
 abbr --add gba 'git branch -a'
 abbr --add gbd 'git branch -D'

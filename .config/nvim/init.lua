@@ -440,6 +440,25 @@ require("lazy").setup({
                 vim.lsp.enable('ruff')
             end
 
+            -- pyright for python
+            if vim.fn.executable('pyright') == 1 then
+                vim.lsp.config('pyright', {
+                    settings = {
+                        pyright = {
+                            -- Using Ruff's importer organizer
+                            disableOrganizeImports = true,
+                        },
+                        python = {
+                            analysis = {
+                                -- ignoer all files for analysis to exclusively use Ruff
+                                ignore = { '*' }
+                            },
+                        },
+                    },
+                })
+                vim.lsp.enable('pyright')
+            end
+
             -- Global mappings.
             -- See `:help vim.diagnostic.*` for documentation on any of the below functions
             vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
@@ -475,6 +494,8 @@ require("lazy").setup({
                     vim.keymap.set('n', '<leader>f', function()
                         vim.lsp.buf.format { async = true }
                     end, opts)
+                    vim.keymap.set('n', 'g[', vim.diagnostic.goto_prev, opts)
+                    vim.keymap.set('n', 'g]', vim.diagnostic.goto_next, opts)
 
                     local client = vim.lsp.get_client_by_id(ev.data.client_id)
 
