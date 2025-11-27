@@ -460,6 +460,11 @@ require("lazy").setup({
                 vim.lsp.enable('pyright')
             end
 
+            -- Markdown
+            if vim.fn.executable('marksman') == 1 then
+                vim.lsp.enable('marksman')
+            end
+
             -- Global mappings.
             -- See `:help vim.diagnostic.*` for documentation on any of the below functions
             vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
@@ -548,6 +553,8 @@ require("lazy").setup({
                 mapping = cmp.mapping.preset.insert({
                     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
                     ['<C-f>'] = cmp.mapping.scroll_docs(4),
+                    ["<S-Tab>"] = cmp.mapping.select_prev_item(),
+                    ["<Tab>"] = cmp.mapping.select_next_item(),
                     ['<C-Space>'] = cmp.mapping.complete(),
                     ['<C-e>'] = cmp.mapping.abort(),
                     -- Accept currently selected item.
@@ -661,8 +668,16 @@ require("lazy").setup({
         opts = {
         formatters_by_ft = {
             python = { "ruff_format" },
+            markdown = { "prettier" },
         },
-        format_on_save = true
+        format_on_save = function(bufnr)
+            local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+            -- Disable format on save for markdown files
+            if ft == "markdown" then
+              return false
+            end
+            return true
+        end,
         },
         init = function()
             vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
