@@ -668,16 +668,17 @@ require("lazy").setup({
         opts = {
         formatters_by_ft = {
             python = { "ruff_format" },
-            markdown = { "prettier" },
+            markdown = { "markdownlint-cli2" },
         },
         format_on_save = function(bufnr)
-            local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
-            -- Disable format on save for markdown files
-            if ft == "markdown" then
-              return false
-            end
-            return true
-        end,
+                local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+
+                -- Disable format on save for markdown files
+                if ft == "markdown" then
+                    return false
+                end
+                return true
+            end,
         },
         init = function()
             vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
