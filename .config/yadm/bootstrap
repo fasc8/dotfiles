@@ -17,11 +17,13 @@ if [ "$SHELL" = "/usr/bin/fish" ]; then
     echo "fish shell found: Install fisher"
     fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
     fish -c "fisher install IlanCosman/tide"
+    fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='24-hour format' --lean_prompt_height='Two lines' --prompt_connection=Disconnected --prompt_spacing=Sparse --icons='Few icons' --transient=No"
   elif ! command -v fisher >/dev/null 2>&1; then
     echo "fisher command not found. Install fisher."
     rm ~/.config/fish/completions/fisher.fish
     fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
     fish -c "fisher install IlanCosman/tide"
+    fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='24-hour format' --lean_prompt_height='Two lines' --prompt_connection=Disconnected --prompt_spacing=Sparse --icons='Few icons' --transient=No"
   fi
 fi
 
