@@ -657,31 +657,34 @@ require("lazy").setup({
         event = { "BufWritePre" },
         cmd = { "ConformInfo" },
         keys = {
-        {
-            "<leader>l",
-            function()
-            require("conform").format({ async = true, lsp_fallback = true })
-            end,
-            desc = "Format buffer",
-        },
+            {
+                "<leader>l",
+                function()
+                require("conform").format({ async = true, lsp_fallback = true })
+                end,
+                desc = "Format buffer",
+            },
         },
         opts = {
-        formatters_by_ft = {
-            python = { "ruff_format" },
-            markdown = { "markdownlint-cli2" },
-        },
-        format_on_save = function(bufnr)
-                local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
-
-                -- Disable format on save for markdown files
-                if ft == "markdown" then
-                    return false
-                end
-                return true
-            end,
+            formatters_by_ft = {
+                python = { "ruff_format" },
+                markdown = { "markdownlint-cli2" },
+            },
+            format_on_save = false,
         },
         init = function()
             vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+
+            -- Create an autocmd for formatting on save except markdown
+            vim.api.nvim_create_autocmd("BufWritePre", {
+                pattern = "*",
+                callback = function(args)
+                    local ft = vim.api.nvim_buf_get_option(args.buf, "filetype")
+                    if ft ~= "markdown" then
+                        require("conform").format({ async = false, lsp_fallback = true, bufnr = args.buf })
+                    end
+                end,
+            })
         end
     },
     -- make sure parent directories exist when creating files
