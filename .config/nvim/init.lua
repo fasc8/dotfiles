@@ -464,7 +464,7 @@ require("lazy").setup({
             vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
             vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
             vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-            vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
+            vim.keymap.set('n', '<leader>el', vim.diagnostic.setloclist)
 
             -- Use LspAttach autocommand to only map the following keys
             -- after the language server attaches to the current buffer
@@ -691,11 +691,13 @@ require("lazy").setup({
     { "luochen1990/rainbow", event = "VeryLazy" },
     -- improved handling of closing buffers
     {
-        "mhinz/vim-sayonara",
-        cmd = { "Sayonara" },
+    {
+        'mhinz/vim-sayonara',
+        cmd = 'Sayonara',
         keys = {
-            { "<leader>q", ":Sayonara!<CR>", mode = "n", noremap = true, silent = true, desc = "Close buffer (Sayonara)" },
+            { "<leader>q", ":Sayonara<CR>", desc = "Close buffer with Sayonara" }
         },
+    }
     },
     -- additional targets in text
     { "wellle/targets.vim", event = "VeryLazy" },
