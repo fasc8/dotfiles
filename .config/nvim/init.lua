@@ -852,7 +852,9 @@ require("lazy").setup({
                         desc = "Open with System Application"
                     },
                     ["P"] = {"toggle_preview", config = {use_float = false}}
-                }
+                },
+                position = "left",
+                width = 20
             },
             default_component_configs = {
                 indent = {
