@@ -672,6 +672,11 @@ require("lazy").setup({
                     "<leader>q",
                     ":Sayonara<CR>",
                     desc = "Close buffer with Sayonara"
+                },
+                {
+                    "<leader>Q",
+                    ":Sayonara!<CR>",
+                    desc = "Close buffer with Sayonara but keep window"
                 }
             }
         }
