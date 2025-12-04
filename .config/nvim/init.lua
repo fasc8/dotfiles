@@ -416,9 +416,9 @@ require("lazy").setup({
 
             -- Use ty for type checking
             -- https://docs.astral.sh/ty/installation/
-            if vim.fn.executable('ty') == 1 then
-                vim.lsp.enable('ty')
-            end
+            -- if vim.fn.executable('ty') == 1 then
+            --     vim.lsp.enable('ty')
+            -- end
 
             -- pyright for python
             if vim.fn.executable('pyright') == 1 then
