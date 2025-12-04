@@ -55,6 +55,9 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 -- never ever make my terminal beep
 vim.opt.vb = true
+-- never ever conceal stuff
+vim.opt.conceallevel = 0
+vim.o.conceallevel = 0
 
 -- more useful diffs (nvim -d)
 --- by ignoring whitespace
@@ -406,12 +409,36 @@ require("lazy").setup({
             end
 
             -- Ruff for Python
+            -- https://docs.astral.sh/ruff/installation/
             if vim.fn.executable('ruff') == 1 then
                 vim.lsp.enable('ruff')
             end
 
+            -- Use ty for type checking
+            -- https://docs.astral.sh/ty/installation/
+            if vim.fn.executable('ty') == 1 then
+                vim.lsp.enable('ty')
+            end
+
             -- pyright for python
             if vim.fn.executable('pyright') == 1 then
+                -- disable hover for ruff if pyright is found
+                if vim.fn.executable('ruff') == 1 then
+                    vim.api.nvim_create_autocmd("LspAttach", {
+                        group = vim.api.nvim_create_augroup('lsp_attach_disable_ruff_hover', { clear = true }),
+                        callback = function(args)
+                            local client = vim.lsp.get_client_by_id(args.data.client_id)
+                            if client == nil then
+                                return
+                            end
+                            if client.name == 'ruff' then
+                                -- Disable hover in favor of Pyright
+                                client.server_capabilities.hoverProvider = false
+                            end
+                        end,
+                        desc = 'LSP: Disable hover capability from Ruff',
+                    })
+                end
                 vim.lsp.config('pyright', {
                     settings = {
                         pyright = {
@@ -644,19 +671,16 @@ require("lazy").setup({
             })
         end
     }, -- make sure parent directories exist when creating files
-    {"jessarcher/vim-heritage", event = "VeryLazy"}, -- show indent lines
+    {"jessarcher/vim-heritage", event = "VeryLazy"},
+    -- show indent lines
     {
-        "Yggdroot/indentLine",
-        event = "BufReadPre",
-        config = function()
-            vim.g.indentLine_char = "│"
-            vim.g.indentLine_enabled = 1
-            -- Adjusted: enable for all filetypes except markdown
-            vim.g.indentLine_fileTypeExclude = {
-                "help", "markdown", "text", "terminal"
-            }
-        end
-    }, -- automatic closing pairs
+        "lukas-reineke/indent-blankline.nvim",
+        main = "ibl",
+        ---@module "ibl"
+        ---@type ibl.config
+        opts = {},
+    },
+    -- automatic closing pairs
     {'windwp/nvim-autopairs', event = "InsertEnter"},
     -- show the registers when it is helpful
     {"junegunn/vim-peekaboo", event = "VeryLazy"},
@@ -704,7 +728,7 @@ require("lazy").setup({
             highlight = {enable = true},
             indent = {enable = true},
             ensure_installed = {
-                "bash", "diff", "dockerfile", "html", "javascript", "lua",
+                "bash", "diff", "dockerfile", "html", "javascript", "json", "lua",
                 "luadoc", "luap", "markdown", "markdown_inline", "python",
                 "regex", "rust", "toml", "vim", "vimdoc", "xml", "yaml"
             },
