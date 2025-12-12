@@ -179,6 +179,9 @@ vim.keymap.set("n", "<leader>h", ":split<CR>", {noremap = true, silent = true})
 vim.keymap.set("n", "<leader>v", ":vsplit<CR>", {noremap = true, silent = true})
 vim.keymap.set("n", "<leader>y", ":History:<CR>",
                {noremap = true, silent = true})
+-- 2x Comma or Semicolon adds it to the end of the line
+vim.keymap.set("i", ";;", "<Esc>A;<Esc>", {noremap = true})
+vim.keymap.set("i", ",,", "<Esc>A,<Esc>", {noremap = true})
 
 -------------------------------------------------------------------------------
 --
@@ -425,9 +428,11 @@ require("lazy").setup({
                 -- disable hover for ruff if pyright is found
                 if vim.fn.executable('ruff') == 1 then
                     vim.api.nvim_create_autocmd("LspAttach", {
-                        group = vim.api.nvim_create_augroup('lsp_attach_disable_ruff_hover', { clear = true }),
+                        group = vim.api.nvim_create_augroup(
+                            'lsp_attach_disable_ruff_hover', {clear = true}),
                         callback = function(args)
-                            local client = vim.lsp.get_client_by_id(args.data.client_id)
+                            local client =
+                                vim.lsp.get_client_by_id(args.data.client_id)
                             if client == nil then
                                 return
                             end
@@ -436,7 +441,7 @@ require("lazy").setup({
                                 client.server_capabilities.hoverProvider = false
                             end
                         end,
-                        desc = 'LSP: Disable hover capability from Ruff',
+                        desc = 'LSP: Disable hover capability from Ruff'
                     })
                 end
                 vim.lsp.config('pyright', {
@@ -671,16 +676,14 @@ require("lazy").setup({
             })
         end
     }, -- make sure parent directories exist when creating files
-    {"jessarcher/vim-heritage", event = "VeryLazy"},
-    -- show indent lines
+    {"jessarcher/vim-heritage", event = "VeryLazy"}, -- show indent lines
     {
         "lukas-reineke/indent-blankline.nvim",
         main = "ibl",
         ---@module "ibl"
         ---@type ibl.config
-        opts = {},
-    },
-    -- automatic closing pairs
+        opts = {}
+    }, -- automatic closing pairs
     {'windwp/nvim-autopairs', event = "InsertEnter"},
     -- show the registers when it is helpful
     {"junegunn/vim-peekaboo", event = "VeryLazy"},
@@ -696,8 +699,7 @@ require("lazy").setup({
                     "<leader>q",
                     ":Sayonara<CR>",
                     desc = "Close buffer with Sayonara"
-                },
-                {
+                }, {
                     "<leader>Q",
                     ":Sayonara!<CR>",
                     desc = "Close buffer with Sayonara but keep window"
@@ -728,9 +730,10 @@ require("lazy").setup({
             highlight = {enable = true},
             indent = {enable = true},
             ensure_installed = {
-                "bash", "diff", "dockerfile", "html", "javascript", "json", "lua",
-                "luadoc", "luap", "markdown", "markdown_inline", "python",
-                "regex", "rust", "toml", "vim", "vimdoc", "xml", "yaml"
+                "bash", "diff", "dockerfile", "html", "javascript", "json",
+                "lua", "luadoc", "luap", "markdown", "markdown_inline",
+                "python", "regex", "rust", "toml", "vim", "vimdoc", "xml",
+                "yaml"
             },
             autotag = {enable = true}
         },
