@@ -400,7 +400,16 @@ require("lazy").setup({
                         checkOnSave = {enable = true},
                         check = {command = "clippy"},
                         imports = {group = {enable = false}},
-                        completion = {postfix = {enable = false}}
+                        completion = {postfix = {enable = false}},
+                        procMacro = {
+                            ignored = {
+                                leptos_macro = {
+                                    -- optional: --
+                                    -- "component",
+                                    "server"
+                                }
+                            }
+                        }
                     }
                 }
             })
@@ -653,7 +662,8 @@ require("lazy").setup({
             formatters_by_ft = {
                 python = {"ruff_format"},
                 markdown = {"markdownlint-cli2"},
-                lua = {"lua-format"}
+                lua = {"lua-format"},
+                rust = {"rustfmt", "leptosfmt"}
             },
             format_on_save = false
         },
