@@ -385,6 +385,12 @@ require("lazy").setup({
                 })
             end)
         end
+    }, -- Coloring of css classes in the editor for tailwind
+    {
+        "roobert/tailwindcss-colorizer-cmp.nvim",
+        config = function()
+            require("tailwindcss-colorizer-cmp").setup({color_square_width = 2})
+        end
     }, -- LSP
     {
         'neovim/nvim-lspconfig',
@@ -475,6 +481,31 @@ require("lazy").setup({
                 vim.lsp.enable('marksman')
             end
 
+            -- Tailwind CSS
+            if vim.fn.executable("tailwindcss-language-server") == 1 then
+                vim.lsp.config("tailwindcss", {
+                    filetypes = {
+                        "html", "css", "scss", "javascript", "javascriptreact",
+                        "typescript", "typescriptreact", "svelte", "vue", "rust"
+                    },
+                    settings = {
+                        tailwindCSS = {includeLanguages = {rust = "html"}}
+                    },
+                    experimental = {
+                        classRegex = {
+                            -- Regex here because of rust cases like:
+                            -- div class=("bg-red-500", active.then(|| "text-white")) {}
+                            -- div class={format!("bg-{}", color)} {}
+                            {'class\\s*=\\s*"([^"]*)"'}, -- view! { class="..." }
+                            {'class\\s*=\\s*\\(([^)]*)\\)'}, -- class=("foo", bar)
+                            {'tw!\\("([^"]*)"\\)'} -- optional: tw!("...")
+                        }
+                    }
+                })
+
+                vim.lsp.enable("tailwindcss")
+            end
+
             -- Global mappings.
             -- See `:help vim.diagnostic.*` for documentation on any of the below functions
             vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
@@ -555,7 +586,19 @@ require("lazy").setup({
         },
         config = function()
             local cmp = require 'cmp'
+
             cmp.setup({
+                formatting = {
+                    format = function(entry, item)
+                        -- apply Tailwind colorizer first
+                        local ok, tw = pcall(require,
+                                             "tailwindcss-colorizer-cmp")
+                        if ok then
+                            item = tw.formatter(entry, item)
+                        end
+                        return item
+                    end
+                },
                 snippet = {
                     -- REQUIRED by nvim-cmp. get rid of it once we can
                     expand = function(args)
