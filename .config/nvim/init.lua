@@ -385,12 +385,6 @@ require("lazy").setup({
                 })
             end)
         end
-    }, -- Coloring of css classes in the editor for tailwind
-    {
-        "roobert/tailwindcss-colorizer-cmp.nvim",
-        config = function()
-            require("tailwindcss-colorizer-cmp").setup({color_square_width = 2})
-        end
     }, -- LSP
     {
         'neovim/nvim-lspconfig',
@@ -588,17 +582,6 @@ require("lazy").setup({
             local cmp = require 'cmp'
 
             cmp.setup({
-                formatting = {
-                    format = function(entry, item)
-                        -- apply Tailwind colorizer first
-                        local ok, tw = pcall(require,
-                                             "tailwindcss-colorizer-cmp")
-                        if ok then
-                            item = tw.formatter(entry, item)
-                        end
-                        return item
-                    end
-                },
                 snippet = {
                     -- REQUIRED by nvim-cmp. get rid of it once we can
                     expand = function(args)
@@ -736,9 +719,7 @@ require("lazy").setup({
         ---@module "ibl"
         ---@type ibl.config
         opts = {}
-    }, -- automatic closing pairs
-    {'windwp/nvim-autopairs', event = "InsertEnter"},
-    -- show the registers when it is helpful
+    }, -- show the registers when it is helpful
     {"junegunn/vim-peekaboo", event = "VeryLazy"},
     -- Rainbow color for parenthesis
     {"luochen1990/rainbow", event = "VeryLazy"},
@@ -770,8 +751,11 @@ require("lazy").setup({
             vim.diagnostic.config({virtual_text = false}) -- Disable Neovim's default virtual text diagnostics
         end
     }, -- highlight todo comments
-    {"folke/todo-comments.nvim", dependencies = {"nvim-lua/plenary.nvim"}},
-    -- Treesitter is a new parser generator tool that we can
+    {
+        "folke/todo-comments.nvim",
+        dependencies = {"nvim-lua/plenary.nvim"},
+        config = function() require("todo-comments").setup {} end
+    }, -- Treesitter is a new parser generator tool that we can
     -- use in Neovim to power faster and more accurate
     -- syntax highlighting.
     {
@@ -825,6 +809,18 @@ require("lazy").setup({
         config = function(_, opts)
             require("nvim-treesitter.configs").setup({textobjects = opts})
         end
+    }, -- automatic closing pairs
+    {'windwp/nvim-autopairs', event = "InsertEnter", config = true},
+    -- rustml to allow for rust and html in treesitter (e.g. for leptos)
+    {
+        "rayliwell/tree-sitter-rstml",
+        dependencies = {"nvim-treesitter"},
+        build = ":TSUpdate",
+        config = function() require("tree-sitter-rstml").setup() end
+    }, -- Automatic tag closing and renaming (optional but highly recommended)
+    {
+        "windwp/nvim-ts-autotag",
+        config = function() require("nvim-ts-autotag").setup() end
     }, {"mg979/vim-visual-multi", branch = "master", event = "VeryLazy"},
     {"bronson/vim-visual-star-search", event = "VeryLazy"},
     -- show key bindings help page
