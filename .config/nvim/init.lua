@@ -811,7 +811,8 @@ require("lazy").setup({
         end
     }, -- automatic closing pairs
     {'windwp/nvim-autopairs', event = "InsertEnter", config = true},
-    -- rustml to allow for rust and html in treesitter (e.g. for leptos)
+    -- rust_with_rstml to allow for rust and html in treesitter (e.g. for
+    -- leptos). Use TSInstall rust_with_rstml if it is not working as expected
     {
         "rayliwell/tree-sitter-rstml",
         dependencies = {"nvim-treesitter"},
