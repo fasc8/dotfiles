@@ -821,6 +821,7 @@ require("lazy").setup({
     }, -- Automatic tag closing and renaming (optional but highly recommended)
     {
         "windwp/nvim-ts-autotag",
+        dependencies = {'nvim-treesitter'},
         config = function() require("nvim-ts-autotag").setup() end
     }, {"mg979/vim-visual-multi", branch = "master", event = "VeryLazy"},
     {"bronson/vim-visual-star-search", event = "VeryLazy"},
