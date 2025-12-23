@@ -957,6 +957,6 @@ require("lazy").setup({
             })
             require("neo-tree").setup(opts)
         end
-    }
+    }, {"karb94/neoscroll.nvim", opts = {}}
 })
 
