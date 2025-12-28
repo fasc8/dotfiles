@@ -771,8 +771,7 @@ require("lazy").setup({
                 "lua", "luadoc", "luap", "markdown", "markdown_inline",
                 "python", "regex", "rust", "toml", "vim", "vimdoc", "xml",
                 "yaml"
-            },
-            autotag = {enable = true}
+            }
         },
         config = function(_, opts)
             require("nvim-treesitter.configs").setup(opts)
