@@ -687,7 +687,7 @@ require("lazy").setup({
         opts = {
             formatters_by_ft = {
                 python = {"ruff_format"},
-                markdown = {"markdownlint-cli2"},
+                markdown = {"markdownlint-cli2", "prettier"},
                 lua = {"lua-format"},
                 rust = {"rustfmt", "leptosfmt"}
             },
