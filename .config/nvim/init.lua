@@ -428,47 +428,45 @@ require("lazy").setup({
 
             -- Use ty for type checking
             -- https://docs.astral.sh/ty/installation/
-            -- if vim.fn.executable('ty') == 1 then
-            --     vim.lsp.enable('ty')
-            -- end
+            if vim.fn.executable('ty') == 1 then vim.lsp.enable('ty') end
 
             -- pyright for python
-            if vim.fn.executable('pyright') == 1 then
-                -- disable hover for ruff if pyright is found
-                if vim.fn.executable('ruff') == 1 then
-                    vim.api.nvim_create_autocmd("LspAttach", {
-                        group = vim.api.nvim_create_augroup(
-                            'lsp_attach_disable_ruff_hover', {clear = true}),
-                        callback = function(args)
-                            local client =
-                                vim.lsp.get_client_by_id(args.data.client_id)
-                            if client == nil then
-                                return
-                            end
-                            if client.name == 'ruff' then
-                                -- Disable hover in favor of Pyright
-                                client.server_capabilities.hoverProvider = false
-                            end
-                        end,
-                        desc = 'LSP: Disable hover capability from Ruff'
-                    })
-                end
-                vim.lsp.config('pyright', {
-                    settings = {
-                        pyright = {
-                            -- Using Ruff's importer organizer
-                            disableOrganizeImports = true
-                        },
-                        python = {
-                            analysis = {
-                                -- ignoer all files for analysis to exclusively use Ruff
-                                ignore = {'*'}
-                            }
-                        }
-                    }
-                })
-                vim.lsp.enable('pyright')
-            end
+            -- if vim.fn.executable('pyright') == 1 then
+            --     -- disable hover for ruff if pyright is found
+            --     if vim.fn.executable('ruff') == 1 then
+            --         vim.api.nvim_create_autocmd("LspAttach", {
+            --             group = vim.api.nvim_create_augroup(
+            --                 'lsp_attach_disable_ruff_hover', {clear = true}),
+            --             callback = function(args)
+            --                 local client =
+            --                     vim.lsp.get_client_by_id(args.data.client_id)
+            --                 if client == nil then
+            --                     return
+            --                 end
+            --                 if client.name == 'ruff' then
+            --                     -- Disable hover in favor of Pyright
+            --                     client.server_capabilities.hoverProvider = false
+            --                 end
+            --             end,
+            --             desc = 'LSP: Disable hover capability from Ruff'
+            --         })
+            --     end
+            --     vim.lsp.config('pyright', {
+            --         settings = {
+            --             pyright = {
+            --                 -- Using Ruff's importer organizer
+            --                 disableOrganizeImports = true
+            --             },
+            --             python = {
+            --                 analysis = {
+            --                     -- ignoer all files for analysis to exclusively use Ruff
+            --                     ignore = {'*'}
+            --                 }
+            --             }
+            --         }
+            --     })
+            --     vim.lsp.enable('pyright')
+            -- end
 
             -- Markdown
             if vim.fn.executable('marksman') == 1 then
