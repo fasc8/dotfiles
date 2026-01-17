@@ -267,8 +267,97 @@ end
 
 -- load plugins in plugins dir
 require("lazy").setup({
-    -- nice bar at the bottom
-    {
+    -- setup stuff
+    { -- easily manage external editor tooling such as LSP servers, linters, etc
+        "mason-org/mason.nvim",
+        opts = {}
+    }, {
+        "WhoIsSethDaniel/mason-tool-installer.nvim",
+        config = function()
+            require("mason-tool-installer").setup({
+                ensure_installed = {
+                    -- ======================
+                    -- LSP SERVERS
+                    -- ======================
+                    {
+                        "rust-analyzer",
+                        condition = function()
+                            return vim.fn.executable("rust-analyzer") ~= 1
+                        end
+                    }, {
+                        "bash-language-server",
+                        condition = function()
+                            return vim.fn.executable("bash-language-server") ~=
+                                       1
+                        end
+                    }, {
+                        "pyright",
+                        condition = function()
+                            return vim.fn.executable("pyright") ~= 1
+                        end
+                    }, {
+                        "marksman",
+                        condition = function()
+                            return vim.fn.executable("marksman") ~= 1
+                        end
+                    }, {
+                        "tailwindcss-language-server",
+                        condition = function()
+                            return vim.fn.executable(
+                                       "tailwindcss-language-server") ~= 1
+                        end
+                    }, -- ======================
+                    -- LINTERS / DIAGNOSTICS
+                    -- ======================
+                    {
+                        "ruff",
+                        condition = function()
+                            return vim.fn.executable("ruff") ~= 1
+                        end
+                    }, {
+                        "ty",
+                        condition = function()
+                            return vim.fn.executable("ty") ~= 1
+                        end
+                    }, {
+                        "markdownlint-cli2",
+                        condition = function()
+                            return vim.fn.executable("markdownlint") ~= 1
+                        end
+                    }, -- ======================
+                    -- FORMATTERS
+                    -- ======================
+                    {
+                        "ruff_format",
+                        condition = function()
+                            return vim.fn.executable("ruff") ~= 1
+                        end
+                    }, {
+                        "prettier",
+                        condition = function()
+                            return vim.fn.executable("prettier") ~= 1
+                        end
+                    }, {
+                        "luaformatter",
+                        condition = function()
+                            return vim.fn.executable("luarocks") == 1 and
+                                       vim.fn.executable("lua-format") ~= 1
+                        end
+                    }
+                    -- {
+                    --     "leptosfmt",
+                    --     condition = function()
+                    --         return vim.fn.executable("leptosfmt") ~= 1
+                    --     end
+                    -- }
+                },
+
+                auto_update = false,
+                run_on_start = false
+            })
+        end
+    }, -- optics / new windows
+    { -- nice bar at the bottom
         'itchyny/lightline.vim',
         lazy = false, -- also load at start since it's UI
         config = function()
@@ -299,25 +388,191 @@ require("lazy").setup({
                 endfunction
                 ]], true)
         end
-    }, -- quick navigation
-    {
+    }, { -- improve handling of white spaces
+        "ntpeters/vim-better-whitespace",
+        event = "BufRead",
+        config = function()
+            vim.g.better_whitespace_enabled = 1
+            vim.g.strip_whitespace_on_save = 1
+            vim.g.strip_whitespace_confirm = 0
+            -- Added markdown to blacklist for convenience
+            vim.g.better_whitespace_filetypes_blacklist = {
+                "diff", "gitcommit", "unite", "qf", "help", "markdown"
+            }
+        end
+    }, { -- Color scheme
+        "navarasu/onedark.nvim",
+        priority = 1000, -- make sure to load this before all the other start plugins
+        config = function()
+            require('onedark').setup {style = 'warm'}
+            require('onedark').load()
+        end
+    }, { -- show the registers when it is helpful
+        "junegunn/vim-peekaboo",
+        event = "VeryLazy"
+    }, { -- Rainbow color for parenthesis
+        "luochen1990/rainbow",
+        event = "VeryLazy"
+    }, { -- highlight todo comments
+        "folke/todo-comments.nvim",
+        dependencies = {"nvim-lua/plenary.nvim"},
+        config = function() require("todo-comments").setup {} end
+    }, { -- show indent lines
+        "lukas-reineke/indent-blankline.nvim",
+        main = "ibl",
+        ---@module "ibl"
+        ---@type ibl.config
+        opts = {}
+    }, { -- show key bindings help page
+        "folke/which-key.nvim",
+        event = "VeryLazy",
+        config = function() require("which-key").setup() end
+    }, { -- file tree
+        "nvim-neo-tree/neo-tree.nvim",
+        branch = "v3.x",
+        dependencies = {
+            "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim",
+            "nvim-tree/nvim-web-devicons" -- optional, but recommended
+        },
+        cmd = "Neotree",
+        keys = {
+            {
+                "<leader>fe",
+                function()
+                    require("neo-tree.command").execute({
+                        toggle = true,
+                        dir = get_root_dir()
+                    })
+                end,
+                desc = "Explorer NeoTree (Root Dir)"
+            }, {
+                "<leader>fE",
+                function()
+                    require("neo-tree.command").execute({
+                        toggle = true,
+                        dir = vim.uv.cwd()
+                    })
+                end,
+                desc = "Explorer NeoTree (cwd)"
+            }, {
+                "<leader>ge",
+                function()
+                    require("neo-tree.command").execute({
+                        source = "git_status",
+                        toggle = true
+                    })
+                end,
+                desc = "Git Explorer"
+            }, {
+                "<leader>be",
+                function()
+                    require("neo-tree.command").execute({
+                        source = "buffers",
+                        toggle = true
+                    })
+                end,
+                desc = "Buffer Explorer"
+            }
+        },
+        -- lazy loading handled by cmd and keys, so no need to set lazy = false
+        init = function()
+            vim.api.nvim_create_autocmd("BufEnter", {
+                group = vim.api.nvim_create_augroup("Neotree_start_directory",
+                                                    {clear = true}),
+                desc = "Start Neo-tree with directory",
+                once = true,
+                callback = function()
+                    if package.loaded["neo-tree"] then
+                        return
+                    else
+                        local stats = vim.loop.fs_stat(vim.fn.argv(0))
+                        if stats and stats.type == "directory" then
+                            require("neo-tree")
+                        end
+                    end
+                end
+            })
+        end,
+        ---@module 'neo-tree'
+        ---@type neotree.Config
+        opts = {
+            sources = {"filesystem", "buffers", "git_status"},
+            open_files_do_not_replace_types = {
+                "terminal", "Trouble", "trouble", "qf", "Outline"
+            },
+            filesystem = {
+                bind_to_cwd = false,
+                follow_current_file = {enabled = true},
+                use_libuv_file_watcher = true,
+                filtered_items = {
+                    visible = true, -- This is what you want: If you set this to `true`, all "hide" just mean "dimmed out"
+                    hide_dotfiles = false,
+                    hide_gitignored = true
+                }
+            },
+            window = {
+                mappings = {
+                    ["l"] = "open",
+                    ["h"] = "close_node",
+                    ["<space>"] = "none",
+                    ["Y"] = {
+                        function(state)
+                            local node = state.tree:get_node()
+                            local path = node:get_id()
+                            vim.fn.setreg("+", path, "c")
+                        end,
+                        desc = "Copy Path to Clipboard"
+                    },
+                    ["O"] = {
+                        function(state)
+                            require("lazy.util").open(
+                                state.tree:get_node().path, {system = true})
+                        end,
+                        desc = "Open with System Application"
+                    },
+                    ["P"] = {"toggle_preview", config = {use_float = false}}
+                },
+                position = "left",
+                width = 20
+            },
+            default_component_configs = {
+                indent = {
+                    with_expanders = true,
+                    expander_collapsed = "▹",
+                    expander_expanded = "▿",
+                    expander_highlight = "NeoTreeExpander"
+                }
+            }
+        },
+        config = function(_, opts)
+            local events = require("neo-tree.events")
+            opts.event_handlers = opts.event_handlers or {}
+            vim.list_extend(opts.event_handlers, {
+                {event = events.FILE_MOVED, handler = on_move},
+                {event = events.FILE_RENAMED, handler = on_move}
+            })
+            require("neo-tree").setup(opts)
+        end
+    }, -- Behavior improvements
+    { -- Smooth scrolling behavior
+        "karb94/neoscroll.nvim",
+        opts = {}
+    }, { -- quick navigation
         'ggandor/leap.nvim',
         config = function()
             vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
             vim.keymap.set('n', 'S', '<Plug>(leap-from-window)')
         end
-    }, -- better %
-    {
+    }, { -- better %
         'andymass/vim-matchup',
         config = function()
             vim.g.matchup_matchparen_offscreen = {method = "popup"}
         end
-    }, -- auto-cd to root of git project
-    {
+    }, { -- auto-cd to root of git project
         'notjedi/nvim-rooter.lua',
         config = function() require('nvim-rooter').setup() end
-    }, -- fzf support for ^p
-    {
+    }, -- Functional improvements
+    { -- fzf support
         'ibhagwan/fzf-lua',
         config = function()
             -- stop putting a giant window over my editor
@@ -385,7 +640,7 @@ require("lazy").setup({
                 })
             end)
         end
-    }, {
+    }, { -- fuzzy finder
         'nvim-telescope/telescope.nvim',
         tag = 'v0.2.1',
         dependencies = {
@@ -418,7 +673,8 @@ require("lazy").setup({
             vim.keymap.set('n', 'gr', builtin.lsp_references)
             vim.keymap.set('n', 'gf', builtin.treesitter)
         end
-    }, { -- LSP
+    }, -- LSP stuff
+    { -- LSP config
         'neovim/nvim-lspconfig',
         config = function()
             -- Setup language servers.
@@ -598,8 +854,7 @@ require("lazy").setup({
                 end
             })
         end
-    }, -- LSP-based code-completion
-    {
+    }, { -- LSP-based code-completion
         "hrsh7th/nvim-cmp",
         -- load cmp on InsertEnter
         event = "InsertEnter",
@@ -640,8 +895,7 @@ require("lazy").setup({
             cmp.setup.cmdline(':',
                               {sources = cmp.config.sources({{name = 'path'}})})
         end
-    }, -- inline function signatures
-    {
+    }, { -- inline function signatures
         "ray-x/lsp_signature.nvim",
         event = "VeryLazy",
         opts = {},
@@ -653,14 +907,12 @@ require("lazy").setup({
             })
         end
     }, -- language support
-    -- yaml
-    {
+    { -- yaml
         "cuducos/yaml.nvim",
         ft = {"yaml"},
         dependencies = {"nvim-treesitter/nvim-treesitter"}
     }, -- fish
-    'khaveesh/vim-fish-syntax', -- markdown
-    {
+    'khaveesh/vim-fish-syntax', { -- markdown
         'plasticboy/vim-markdown',
         ft = {"markdown"},
         dependencies = {'godlygeek/tabular'},
@@ -675,31 +927,10 @@ require("lazy").setup({
             -- https://github.com/preservim/vim-markdown/issues/232
             vim.g.vim_markdown_auto_insert_bullets = 0
         end
-    }, -- improve handling of white spaces
-    {
-        "ntpeters/vim-better-whitespace",
-        event = "BufRead",
-        config = function()
-            vim.g.better_whitespace_enabled = 1
-            vim.g.strip_whitespace_on_save = 1
-            vim.g.strip_whitespace_confirm = 0
-            -- Added markdown to blacklist for convenience
-            vim.g.better_whitespace_filetypes_blacklist = {
-                "diff", "gitcommit", "unite", "qf", "help", "markdown"
-            }
-        end
-    }, -- Color scheme
-    {
-        "navarasu/onedark.nvim",
-        priority = 1000, -- make sure to load this before all the other start plugins
-        config = function()
-            require('onedark').setup {style = 'warm'}
-            require('onedark').load()
-        end
-    }, -- commentary key binds and handling
-    {"tpope/vim-commentary", event = "VeryLazy"},
-    -- Improved formatting on save
-    {
+    }, { -- commentary key binds and handling
+        "tpope/vim-commentary",
+        event = "VeryLazy"
+    }, { -- Improved formatting on save
         "stevearc/conform.nvim",
         event = {"BufWritePre"},
         cmd = {"ConformInfo"},
@@ -742,20 +973,10 @@ require("lazy").setup({
                 end
             })
         end
-    }, -- make sure parent directories exist when creating files
-    {"jessarcher/vim-heritage", event = "VeryLazy"}, -- show indent lines
-    {
-        "lukas-reineke/indent-blankline.nvim",
-        main = "ibl",
-        ---@module "ibl"
-        ---@type ibl.config
-        opts = {}
-    }, -- show the registers when it is helpful
-    {"junegunn/vim-peekaboo", event = "VeryLazy"},
-    -- Rainbow color for parenthesis
-    {"luochen1990/rainbow", event = "VeryLazy"},
-    -- improved handling of closing buffers
-    {
+    }, { -- make sure parent directories exist when creating files
+        "jessarcher/vim-heritage",
+        event = "VeryLazy"
+    }, { -- improved handling of closing buffers
         {
             'mhinz/vim-sayonara',
             cmd = 'Sayonara',
@@ -771,9 +992,10 @@ require("lazy").setup({
                 }
             }
         }
-    }, -- additional targets in text
-    {"wellle/targets.vim", event = "VeryLazy"}, -- improved diagnostic windows
-    {
+    }, { -- additional targets in text
+        "wellle/targets.vim",
+        event = "VeryLazy"
+    }, { -- improved diagnostic windows
         "rachartier/tiny-inline-diagnostic.nvim",
         event = "VeryLazy",
         priority = 1000,
@@ -781,11 +1003,6 @@ require("lazy").setup({
             require("tiny-inline-diagnostic").setup()
             vim.diagnostic.config({virtual_text = false}) -- Disable Neovim's default virtual text diagnostics
         end
-    }, -- highlight todo comments
-    {
-        "folke/todo-comments.nvim",
-        dependencies = {"nvim-lua/plenary.nvim"},
-        config = function() require("todo-comments").setup {} end
     }, -- Treesitter is a new parser generator tool that we can
     -- use in Neovim to power faster and more accurate
     -- syntax highlighting.
@@ -839,155 +1056,23 @@ require("lazy").setup({
         config = function(_, opts)
             require("nvim-treesitter.configs").setup({textobjects = opts})
         end
-    }, -- automatic closing pairs
-    {'windwp/nvim-autopairs', event = "InsertEnter", config = true},
-    -- rust_with_rstml to allow for rust and html in treesitter (e.g. for
-    -- leptos). Use TSInstall rust_with_rstml if it is not working as expected
-    {
+    }, { -- automatic closing pairs
+        'windwp/nvim-autopairs',
+        event = "InsertEnter",
+        config = true
+    }, { -- rust_with_rstml to allow for rust and html in treesitter (e.g. for
+        -- leptos). Use TSInstall rust_with_rstml if it is not working as expected
         "rayliwell/tree-sitter-rstml",
         dependencies = {"nvim-treesitter"},
         build = ":TSUpdate",
         config = function() require("tree-sitter-rstml").setup() end
-    }, -- Automatic tag closing and renaming (optional but highly recommended)
-    {
+    },
+    { -- Automatic tag closing and renaming (optional but highly recommended)
         "windwp/nvim-ts-autotag",
         dependencies = {'nvim-treesitter'},
         config = function() require("nvim-ts-autotag").setup() end
     }, {"mg979/vim-visual-multi", branch = "master", event = "VeryLazy"},
-    {"bronson/vim-visual-star-search", event = "VeryLazy"},
-    -- show key bindings help page
-    {
-        "folke/which-key.nvim",
-        event = "VeryLazy",
-        config = function() require("which-key").setup() end
-    }, -- file tree
-    {
-        "nvim-neo-tree/neo-tree.nvim",
-        branch = "v3.x",
-        dependencies = {
-            "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim",
-            "nvim-tree/nvim-web-devicons" -- optional, but recommended
-        },
-        cmd = "Neotree",
-        keys = {
-            {
-                "<leader>fe",
-                function()
-                    require("neo-tree.command").execute({
-                        toggle = true,
-                        dir = get_root_dir()
-                    })
-                end,
-                desc = "Explorer NeoTree (Root Dir)"
-            }, {
-                "<leader>fE",
-                function()
-                    require("neo-tree.command").execute({
-                        toggle = true,
-                        dir = vim.uv.cwd()
-                    })
-                end,
-                desc = "Explorer NeoTree (cwd)"
-            }, {
-                "<leader>ge",
-                function()
-                    require("neo-tree.command").execute({
-                        source = "git_status",
-                        toggle = true
-                    })
-                end,
-                desc = "Git Explorer"
-            }, {
-                "<leader>be",
-                function()
-                    require("neo-tree.command").execute({
-                        source = "buffers",
-                        toggle = true
-                    })
-                end,
-                desc = "Buffer Explorer"
-            }
-        },
-        -- lazy loading handled by cmd and keys, so no need to set lazy = false
-        init = function()
-            vim.api.nvim_create_autocmd("BufEnter", {
-                group = vim.api.nvim_create_augroup("Neotree_start_directory",
-                                                    {clear = true}),
-                desc = "Start Neo-tree with directory",
-                once = true,
-                callback = function()
-                    if package.loaded["neo-tree"] then
-                        return
-                    else
-                        local stats = vim.loop.fs_stat(vim.fn.argv(0))
-                        if stats and stats.type == "directory" then
-                            require("neo-tree")
-                        end
-                    end
-                end
-            })
-        end,
-        ---@module 'neo-tree'
-        ---@type neotree.Config
-        opts = {
-            sources = {"filesystem", "buffers", "git_status"},
-            open_files_do_not_replace_types = {
-                "terminal", "Trouble", "trouble", "qf", "Outline"
-            },
-            filesystem = {
-                bind_to_cwd = false,
-                follow_current_file = {enabled = true},
-                use_libuv_file_watcher = true,
-                filtered_items = {
-                    visible = true, -- This is what you want: If you set this to `true`, all "hide" just mean "dimmed out"
-                    hide_dotfiles = false,
-                    hide_gitignored = true
-                }
-            },
-            window = {
-                mappings = {
-                    ["l"] = "open",
-                    ["h"] = "close_node",
-                    ["<space>"] = "none",
-                    ["Y"] = {
-                        function(state)
-                            local node = state.tree:get_node()
-                            local path = node:get_id()
-                            vim.fn.setreg("+", path, "c")
-                        end,
-                        desc = "Copy Path to Clipboard"
-                    },
-                    ["O"] = {
-                        function(state)
-                            require("lazy.util").open(
-                                state.tree:get_node().path, {system = true})
-                        end,
-                        desc = "Open with System Application"
-                    },
-                    ["P"] = {"toggle_preview", config = {use_float = false}}
-                },
-                position = "left",
-                width = 20
-            },
-            default_component_configs = {
-                indent = {
-                    with_expanders = true,
-                    expander_collapsed = "▹",
-                    expander_expanded = "▿",
-                    expander_highlight = "NeoTreeExpander"
-                }
-            }
-        },
-        config = function(_, opts)
-            local events = require("neo-tree.events")
-            opts.event_handlers = opts.event_handlers or {}
-            vim.list_extend(opts.event_handlers, {
-                {event = events.FILE_MOVED, handler = on_move},
-                {event = events.FILE_RENAMED, handler = on_move}
-            })
-            require("neo-tree").setup(opts)
-        end
-    }, -- Smooth scrolling behavior
-    {"karb94/neoscroll.nvim", opts = {}}
+    {"bronson/vim-visual-star-search", event = "VeryLazy"}
+
 })
 
