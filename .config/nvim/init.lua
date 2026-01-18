@@ -975,9 +975,38 @@ require("lazy").setup({
             }
         },
         opts = {
+            formatters = {
+                prettier = {
+                    command = function()
+                        local buf = vim.api.nvim_buf_get_name(0)
+                        if buf == "" then
+                            return "prettier"
+                        end
+
+                        local dir = vim.fn.fnamemodify(buf, ":p:h")
+
+                        while dir and dir ~= "/" do
+                            local candidate = dir ..
+                                                  "/node_modules/.bin/prettier"
+                            if vim.fn.executable(candidate) == 1 then
+                                return candidate
+                            end
+
+                            local parent = vim.fn.fnamemodify(dir, ":h")
+                            if parent == dir then
+                                break
+                            end
+                            dir = parent
+                        end
+
+                        return "prettier"
+                    end
+                }
+            },
             formatters_by_ft = {
                 python = {"ruff_format"},
-                markdown = {"markdownlint-cli2", "prettier"},
+                markdown = {"markdownlint-cli2"},
+                slidev = {"prettier"},
                 lua = {"lua-format"},
                 rust = {"rustfmt", "leptosfmt"}
             },
