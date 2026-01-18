@@ -285,17 +285,23 @@ require("lazy").setup({
                             return vim.fn.executable("rust-analyzer") ~= 1
                         end
                     }, {
+                        "harper-ls",
+                        condition = function()
+                            return vim.fn.executable("harper-ls") ~= 1
+                        end
+                    }, {
                         "bash-language-server",
                         condition = function()
                             return vim.fn.executable("bash-language-server") ~=
                                        1
                         end
-                    }, {
-                        "pyright",
-                        condition = function()
-                            return vim.fn.executable("pyright") ~= 1
-                        end
-                    }, {
+                    }, -- {
+                    --     "pyright",
+                    --     condition = function()
+                    --         return vim.fn.executable("pyright") ~= 1
+                    --     end
+                    -- },
+                    {
                         "marksman",
                         condition = function()
                             return vim.fn.executable("marksman") ~= 1
@@ -328,11 +334,6 @@ require("lazy").setup({
                     -- FORMATTERS
                     -- ======================
                     {
-                        "ruff_format",
-                        condition = function()
-                            return vim.fn.executable("ruff") ~= 1
-                        end
-                    }, {
                         "prettier",
                         condition = function()
                             return vim.fn.executable("prettier") ~= 1
@@ -678,45 +679,58 @@ require("lazy").setup({
         'neovim/nvim-lspconfig',
         config = function()
             -- Setup language servers.
+            -- Server-specific settings. See `:help lspconfig-setup`
 
-            -- Rust
-            vim.lsp.config('rust_analyzer', {
-                -- Server-specific settings. See `:help lspconfig-setup`
-                settings = {
-                    ["rust-analyzer"] = {
-                        cargo = {features = "all"},
-                        checkOnSave = {enable = true},
-                        check = {command = "clippy"},
-                        imports = {group = {enable = false}},
-                        completion = {postfix = {enable = false}},
-                        procMacro = {
-                            ignored = {
-                                leptos_macro = {
-                                    -- optional: --
-                                    -- "component",
-                                    "server"
+            -- Rust analyzer
+            if vim.fn.executable('rust-analyzer') == 1 then
+                vim.lsp.config('rust-analyzer', {
+                    cmd = {"rust-analyzer"},
+                    filetypes = {"rust"},
+                    settings = {
+                        ["rust-analyzer"] = {
+                            cargo = {features = "all"},
+                            checkOnSave = {enable = true},
+                            check = {command = "clippy"},
+                            imports = {group = {enable = false}},
+                            completion = {postfix = {enable = false}},
+                            procMacro = {
+                                ignored = {
+                                    leptos_macro = {
+                                        -- optional: --
+                                        -- "component",
+                                        "server"
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            })
-            vim.lsp.enable('rust_analyzer')
+                })
+                vim.lsp.enable('rust_analyzer')
+            end
 
             -- Bash LSP
             if vim.fn.executable('bash-language-server') == 1 then
+                vim.lsp.config('bashls', {
+                    cmd = {"bash-language-server", "start"},
+                    filetypes = {"sh"}
+                })
                 vim.lsp.enable('bashls')
             end
 
             -- Ruff for Python
             -- https://docs.astral.sh/ruff/installation/
-            if vim.fn.executable('ruff') == 1 then
+            if vim.fn.executable('ruff-lsp') == 1 then
+                vim.lsp.config('ruff',
+                               {cmd = {"ruff-lsp"}, filetypes = {"python"}})
                 vim.lsp.enable('ruff')
             end
 
             -- Use ty for type checking
             -- https://docs.astral.sh/ty/installation/
-            if vim.fn.executable('ty') == 1 then vim.lsp.enable('ty') end
+            if vim.fn.executable('ty') == 1 then
+                vim.lsp.config('ty', {cmd = {"ty"}, filetypes = {"python"}})
+                vim.lsp.enable('ty')
+            end
 
             -- pyright for python
             -- if vim.fn.executable('pyright') == 1 then
@@ -758,12 +772,17 @@ require("lazy").setup({
 
             -- Markdown
             if vim.fn.executable('marksman') == 1 then
+                vim.lsp.config('marksman', {
+                    cmd = {"marksman", "server"},
+                    filetypes = {"markdown"}
+                })
                 vim.lsp.enable('marksman')
             end
 
             -- Tailwind CSS
             if vim.fn.executable("tailwindcss-language-server") == 1 then
                 vim.lsp.config("tailwindcss", {
+                    cmd = {"tailwindcss-language-server", "--stdio"},
                     filetypes = {
                         "html", "css", "scss", "javascript", "javascriptreact",
                         "typescript", "typescriptreact", "svelte", "vue", "rust"
@@ -784,6 +803,15 @@ require("lazy").setup({
                 })
 
                 vim.lsp.enable("tailwindcss")
+            end
+
+            -- Harper-ls grammar checker
+            if vim.fn.executable('harper-ls') == 1 then
+                vim.lsp.config('harper-ls', {
+                    cmd = {"harper-ls", "--stdio"},
+                    filetypes = {"markdown", "text"}
+                })
+                vim.lsp.enable('harper-ls')
             end
 
             -- Global mappings.
