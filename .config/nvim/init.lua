@@ -290,6 +290,11 @@ require("lazy").setup({
                             return vim.fn.executable("harper-ls") ~= 1
                         end
                     }, {
+                        "vale-ls",
+                        condition = function()
+                            return vim.fn.executable("vale-ls") ~= 1
+                        end
+                    }, {
                         "bash-language-server",
                         condition = function()
                             return vim.fn.executable("bash-language-server") ~=
@@ -812,6 +817,16 @@ require("lazy").setup({
                     filetypes = {"markdown", "text"}
                 })
                 vim.lsp.enable('harper-ls')
+            end
+
+            -- Vale for slidev slides grammar checking
+            if vim.fn.executable("vale-ls") == 1 then
+                vim.lsp.config("vale-ls", {
+                    cmd = {"vale-ls"},
+                    filetypes = {"slidev"},
+                    root_dir = vim.fs.root(0, {".vale.ini", ".git"})
+                })
+                vim.lsp.enable("vale-ls")
             end
 
             -- Global mappings.
