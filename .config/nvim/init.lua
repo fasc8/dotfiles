@@ -725,15 +725,18 @@ require("lazy").setup({
             -- Ruff for Python
             -- https://docs.astral.sh/ruff/installation/
             if vim.fn.executable('ruff-lsp') == 1 then
-                vim.lsp.config('ruff',
-                               {cmd = {"ruff-lsp"}, filetypes = {"python"}})
+                vim.lsp.config('ruff', {
+                    cmd = {"ruff", "server"},
+                    filetypes = {"python"}
+                })
                 vim.lsp.enable('ruff')
             end
 
             -- Use ty for type checking
             -- https://docs.astral.sh/ty/installation/
             if vim.fn.executable('ty') == 1 then
-                vim.lsp.config('ty', {cmd = {"ty"}, filetypes = {"python"}})
+                vim.lsp.config('ty',
+                               {cmd = {"ty", "server"}, filetypes = {"python"}})
                 vim.lsp.enable('ty')
             end
 
