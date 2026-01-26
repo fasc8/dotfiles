@@ -682,6 +682,7 @@ require("lazy").setup({
     }, -- LSP stuff
     { -- LSP config
         'neovim/nvim-lspconfig',
+        dependencies = {"mason-org/mason.nvim"},
         config = function()
             -- Setup language servers.
             -- Server-specific settings. See `:help lspconfig-setup`
@@ -724,7 +725,7 @@ require("lazy").setup({
 
             -- Ruff for Python
             -- https://docs.astral.sh/ruff/installation/
-            if vim.fn.executable('ruff-lsp') == 1 then
+            if vim.fn.executable('ruff') == 1 then
                 vim.lsp.config('ruff', {
                     cmd = {"ruff", "server"},
                     filetypes = {"python"}
