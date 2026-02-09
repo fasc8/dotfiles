@@ -267,8 +267,103 @@ end
 
 -- load plugins in plugins dir
 require("lazy").setup({
-    -- nice bar at the bottom
-    {
+    -- setup stuff
+    { -- easily manage external editor tooling such as LSP servers, linters, etc
+        "mason-org/mason.nvim",
+        opts = {}
+    }, {
+        "WhoIsSethDaniel/mason-tool-installer.nvim",
+        config = function()
+            require("mason-tool-installer").setup({
+                ensure_installed = {
+                    -- ======================
+                    -- LSP SERVERS
+                    -- ======================
+                    {
+                        "rust-analyzer",
+                        condition = function()
+                            return vim.fn.executable("rust-analyzer") ~= 1
+                        end
+                    }, {
+                        "harper-ls",
+                        condition = function()
+                            return vim.fn.executable("harper-ls") ~= 1
+                        end
+                    }, {
+                        "vale-ls",
+                        condition = function()
+                            return vim.fn.executable("vale-ls") ~= 1
+                        end
+                    }, {
+                        "bash-language-server",
+                        condition = function()
+                            return vim.fn.executable("bash-language-server") ~=
+                                       1
+                        end
+                    }, -- {
+                    --     "pyright",
+                    --     condition = function()
+                    --         return vim.fn.executable("pyright") ~= 1
+                    --     end
+                    -- },
+                    {
+                        "marksman",
+                        condition = function()
+                            return vim.fn.executable("marksman") ~= 1
+                        end
+                    }, {
+                        "tailwindcss-language-server",
+                        condition = function()
+                            return vim.fn.executable(
+                                       "tailwindcss-language-server") ~= 1
+                        end
+                    }, -- ======================
+                    -- LINTERS / DIAGNOSTICS
+                    -- ======================
+                    {
+                        "ruff",
+                        condition = function()
+                            return vim.fn.executable("ruff") ~= 1
+                        end
+                    }, {
+                        "ty",
+                        condition = function()
+                            return vim.fn.executable("ty") ~= 1
+                        end
+                    }, {
+                        "markdownlint-cli2",
+                        condition = function()
+                            return vim.fn.executable("markdownlint") ~= 1
+                        end
+                    }, -- ======================
+                    -- FORMATTERS
+                    -- ======================
+                    {
+                        "prettier",
+                        condition = function()
+                            return vim.fn.executable("prettier") ~= 1
+                        end
+                    }, {
+                        "luaformatter",
+                        condition = function()
+                            return vim.fn.executable("luarocks") == 1 and
+                                       vim.fn.executable("lua-format") ~= 1
+                        end
+                    }
+                    -- {
+                    --     "leptosfmt",
+                    --     condition = function()
+                    --         return vim.fn.executable("leptosfmt") ~= 1
+                    --     end
+                    -- }
+                },
+
+                auto_update = false,
+                run_on_start = false
+            })
+        end
+    }, -- optics / new windows
+    { -- nice bar at the bottom
         'itchyny/lightline.vim',
         lazy = false, -- also load at start since it's UI
         config = function()
@@ -299,353 +394,7 @@ require("lazy").setup({
                 endfunction
                 ]], true)
         end
-    }, -- quick navigation
-    {
-        'ggandor/leap.nvim',
-        config = function()
-            vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
-            vim.keymap.set('n', 'S', '<Plug>(leap-from-window)')
-        end
-    }, -- better %
-    {
-        'andymass/vim-matchup',
-        config = function()
-            vim.g.matchup_matchparen_offscreen = {method = "popup"}
-        end
-    }, -- auto-cd to root of git project
-    {
-        'notjedi/nvim-rooter.lua',
-        config = function() require('nvim-rooter').setup() end
-    }, -- fzf support for ^p
-    {
-        'ibhagwan/fzf-lua',
-        config = function()
-            -- stop putting a giant window over my editor
-            require'fzf-lua'.setup {
-                winopts = {
-                    split = "belowright 10new",
-                    preview = {hidden = true}
-                },
-                files = {
-                    -- file icons are distracting
-                    file_icons = false,
-                    -- git icons are nice
-                    git_icons = true,
-                    -- but don't mess up my anchored search
-                    _fzf_nth_devicons = true
-                },
-                buffers = {
-                    file_icons = false,
-                    git_icons = true
-                    -- no nth_devicons as we'll do that
-                    -- manually since we also use
-                    -- with-nth
-                },
-                fzf_opts = {
-                    -- no reverse view
-                    ["--layout"] = "default"
-                }
-            }
-            -- when using C-p for quick file open, pass the file list through
-            --
-            --   https://github.com/jonhoo/proximity-sort
-            --
-            -- to prefer files closer to the current file.
-            vim.keymap.set('', '<C-p>', function()
-                opts = {}
-                opts.cmd =
-                    'fd --color=never --hidden --type f --type l --exclude .git'
-                local base = vim.fn.fnamemodify(vim.fn.expand('%'), ':h:.:S')
-                if base ~= '.' then
-                    -- if there is no current file,
-                    -- proximity-sort can't do its thing
-                    opts.cmd = opts.cmd ..
-                                   (" | proximity-sort %s"):format(
-                                       vim.fn.shellescape(vim.fn.expand('%')))
-                end
-                opts.fzf_opts = {
-                    ['--scheme'] = 'path',
-                    ['--tiebreak'] = 'index',
-                    ["--layout"] = "default"
-                }
-                require'fzf-lua'.files(opts)
-            end)
-            -- use fzf to search buffers as well
-            vim.keymap.set('n', '<leader>;', function()
-                require'fzf-lua'.buffers({
-                    -- just include the paths in the fzf bits, and nothing else
-                    -- https://github.com/ibhagwan/fzf-lua/issues/2230#issuecomment-3164258823
-                    fzf_opts = {
-                        ["--with-nth"] = "{-3..-2}",
-                        ["--nth"] = "-1",
-                        ["--delimiter"] = "[:\u{2002}]",
-                        ["--header-lines"] = "false"
-                    },
-                    header = false
-                })
-            end)
-        end
-    }, -- LSP
-    {
-        'neovim/nvim-lspconfig',
-        config = function()
-            -- Setup language servers.
-
-            -- Rust
-            vim.lsp.config('rust_analyzer', {
-                -- Server-specific settings. See `:help lspconfig-setup`
-                settings = {
-                    ["rust-analyzer"] = {
-                        cargo = {features = "all"},
-                        checkOnSave = {enable = true},
-                        check = {command = "clippy"},
-                        imports = {group = {enable = false}},
-                        completion = {postfix = {enable = false}},
-                        procMacro = {
-                            ignored = {
-                                leptos_macro = {
-                                    -- optional: --
-                                    -- "component",
-                                    "server"
-                                }
-                            }
-                        }
-                    }
-                }
-            })
-            vim.lsp.enable('rust_analyzer')
-
-            -- Bash LSP
-            if vim.fn.executable('bash-language-server') == 1 then
-                vim.lsp.enable('bashls')
-            end
-
-            -- Ruff for Python
-            -- https://docs.astral.sh/ruff/installation/
-            if vim.fn.executable('ruff') == 1 then
-                vim.lsp.enable('ruff')
-            end
-
-            -- Use ty for type checking
-            -- https://docs.astral.sh/ty/installation/
-            -- if vim.fn.executable('ty') == 1 then
-            --     vim.lsp.enable('ty')
-            -- end
-
-            -- pyright for python
-            if vim.fn.executable('pyright') == 1 then
-                -- disable hover for ruff if pyright is found
-                if vim.fn.executable('ruff') == 1 then
-                    vim.api.nvim_create_autocmd("LspAttach", {
-                        group = vim.api.nvim_create_augroup(
-                            'lsp_attach_disable_ruff_hover', {clear = true}),
-                        callback = function(args)
-                            local client =
-                                vim.lsp.get_client_by_id(args.data.client_id)
-                            if client == nil then
-                                return
-                            end
-                            if client.name == 'ruff' then
-                                -- Disable hover in favor of Pyright
-                                client.server_capabilities.hoverProvider = false
-                            end
-                        end,
-                        desc = 'LSP: Disable hover capability from Ruff'
-                    })
-                end
-                vim.lsp.config('pyright', {
-                    settings = {
-                        pyright = {
-                            -- Using Ruff's importer organizer
-                            disableOrganizeImports = true
-                        },
-                        python = {
-                            analysis = {
-                                -- ignoer all files for analysis to exclusively use Ruff
-                                ignore = {'*'}
-                            }
-                        }
-                    }
-                })
-                vim.lsp.enable('pyright')
-            end
-
-            -- Markdown
-            if vim.fn.executable('marksman') == 1 then
-                vim.lsp.enable('marksman')
-            end
-
-            -- Tailwind CSS
-            if vim.fn.executable("tailwindcss-language-server") == 1 then
-                vim.lsp.config("tailwindcss", {
-                    filetypes = {
-                        "html", "css", "scss", "javascript", "javascriptreact",
-                        "typescript", "typescriptreact", "svelte", "vue", "rust"
-                    },
-                    settings = {
-                        tailwindCSS = {includeLanguages = {rust = "html"}}
-                    },
-                    experimental = {
-                        classRegex = {
-                            -- Regex here because of rust cases like:
-                            -- div class=("bg-red-500", active.then(|| "text-white")) {}
-                            -- div class={format!("bg-{}", color)} {}
-                            {'class\\s*=\\s*"([^"]*)"'}, -- view! { class="..." }
-                            {'class\\s*=\\s*\\(([^)]*)\\)'}, -- class=("foo", bar)
-                            {'tw!\\("([^"]*)"\\)'} -- optional: tw!("...")
-                        }
-                    }
-                })
-
-                vim.lsp.enable("tailwindcss")
-            end
-
-            -- Global mappings.
-            -- See `:help vim.diagnostic.*` for documentation on any of the below functions
-            vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
-            vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-            vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-            vim.keymap.set('n', '<leader>el', vim.diagnostic.setloclist)
-
-            -- Use LspAttach autocommand to only map the following keys
-            -- after the language server attaches to the current buffer
-            vim.api.nvim_create_autocmd('LspAttach', {
-                group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-                callback = function(ev)
-                    -- Enable completion triggered by <c-x><c-o>
-                    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
-
-                    -- Buffer local mappings.
-                    -- See `:help vim.lsp.*` for documentation on any of the below functions
-                    local opts = {buffer = ev.buf}
-                    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-                    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-                    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-                    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-                    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help,
-                                   opts)
-                    vim.keymap.set('n', '<leader>wa',
-                                   vim.lsp.buf.add_workspace_folder, opts)
-                    vim.keymap.set('n', '<leader>wr',
-                                   vim.lsp.buf.remove_workspace_folder, opts)
-                    vim.keymap.set('n', '<leader>wl', function()
-                        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-                    end, opts)
-                    -- vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
-                    vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, opts)
-                    vim.keymap.set({'n', 'v'}, '<leader>a',
-                                   vim.lsp.buf.code_action, opts)
-                    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-                    vim.keymap.set('n', '<leader>f', function()
-                        vim.lsp.buf.format {async = true}
-                    end, opts)
-                    vim.keymap.set('n', 'g[', vim.diagnostic.goto_prev, opts)
-                    vim.keymap.set('n', 'g]', vim.diagnostic.goto_next, opts)
-
-                    local client = vim.lsp.get_client_by_id(ev.data.client_id)
-
-                    -- TODO: find some way to make this only apply to the current line.
-                    if client.server_capabilities.inlayHintProvider then
-                        vim.lsp.inlay_hint.enable(false, {bufnr = bufnr})
-                    end
-
-                    -- None of this semantics tokens business.
-                    -- https://www.reddit.com/r/neovim/comments/143efmd/is_it_possible_to_disable_treesitter_completely/
-                    client.server_capabilities.semanticTokensProvider = nil
-
-                    -- format on save for Rust
-                    if client.server_capabilities.documentFormattingProvider then
-                        vim.api.nvim_create_autocmd("BufWritePre", {
-                            group = vim.api.nvim_create_augroup("RustFormat",
-                                                                {clear = true}),
-                            buffer = bufnr,
-                            callback = function()
-                                vim.lsp.buf.format({bufnr = bufnr})
-                            end
-                        })
-                    end
-                end
-            })
-        end
-    }, -- LSP-based code-completion
-    {
-        "hrsh7th/nvim-cmp",
-        -- load cmp on InsertEnter
-        event = "InsertEnter",
-        -- these dependencies will only be loaded when cmp loads
-        -- dependencies are always lazy-loaded unless specified otherwise
-        dependencies = {
-            'neovim/nvim-lspconfig', "hrsh7th/cmp-nvim-lsp",
-            "hrsh7th/cmp-buffer", "hrsh7th/cmp-path"
-        },
-        config = function()
-            local cmp = require 'cmp'
-
-            cmp.setup({
-                snippet = {
-                    -- REQUIRED by nvim-cmp. get rid of it once we can
-                    expand = function(args)
-                        vim.snippet.expand(args.body)
-                    end
-                },
-                mapping = cmp.mapping.preset.insert({
-                    ["<S-Tab>"] = cmp.mapping.select_prev_item(),
-                    ["<Tab>"] = cmp.mapping.select_next_item(),
-                    ['<C-Space>'] = cmp.mapping.complete(),
-                    ['<C-e>'] = cmp.mapping.abort(),
-                    -- Accept currently selected item.
-                    -- Set `select` to `false` to only confirm explicitly selected items.
-                    ['<CR>'] = cmp.mapping.confirm({
-                        select = true,
-                        behavior = cmp.ConfirmBehavior.Insert
-                    })
-                }),
-                sources = cmp.config.sources({{name = 'nvim_lsp'}},
-                                             {{name = 'path'}}),
-                experimental = {ghost_text = true}
-            })
-
-            -- Enable completing paths in :
-            cmp.setup.cmdline(':',
-                              {sources = cmp.config.sources({{name = 'path'}})})
-        end
-    }, -- inline function signatures
-    {
-        "ray-x/lsp_signature.nvim",
-        event = "VeryLazy",
-        opts = {},
-        config = function(_, opts)
-            -- Get signatures (and _only_ signatures) when in argument lists.
-            require"lsp_signature".setup({
-                doc_lines = 0,
-                handler_opts = {border = "none"}
-            })
-        end
-    }, -- language support
-    -- yaml
-    {
-        "cuducos/yaml.nvim",
-        ft = {"yaml"},
-        dependencies = {"nvim-treesitter/nvim-treesitter"}
-    }, -- fish
-    'khaveesh/vim-fish-syntax', -- markdown
-    {
-        'plasticboy/vim-markdown',
-        ft = {"markdown"},
-        dependencies = {'godlygeek/tabular'},
-        config = function()
-            -- never ever fold!
-            vim.g.vim_markdown_folding_disabled = 1
-            -- support front-matter in .md files
-            vim.g.vim_markdown_frontmatter = 1
-            -- 'o' on a list item should insert at same level
-            vim.g.vim_markdown_new_list_item_indent = 0
-            -- don't add bullets when wrapping:
-            -- https://github.com/preservim/vim-markdown/issues/232
-            vim.g.vim_markdown_auto_insert_bullets = 0
-        end
-    }, -- improve handling of white spaces
-    {
+    }, { -- improve handling of white spaces
         "ntpeters/vim-better-whitespace",
         event = "BufRead",
         config = function()
@@ -657,180 +406,34 @@ require("lazy").setup({
                 "diff", "gitcommit", "unite", "qf", "help", "markdown"
             }
         end
-    }, -- Color scheme
-    {
+    }, { -- Color scheme
         "navarasu/onedark.nvim",
         priority = 1000, -- make sure to load this before all the other start plugins
         config = function()
             require('onedark').setup {style = 'warm'}
             require('onedark').load()
         end
-    }, -- commentary key binds and handling
-    {"tpope/vim-commentary", event = "VeryLazy"},
-    -- Improved formatting on save
-    {
-        "stevearc/conform.nvim",
-        event = {"BufWritePre"},
-        cmd = {"ConformInfo"},
-        keys = {
-            {
-                "<leader>l",
-                function()
-                    require("conform").format({
-                        async = true,
-                        lsp_fallback = true
-                    })
-                end,
-                desc = "Format buffer"
-            }
-        },
-        opts = {
-            formatters_by_ft = {
-                python = {"ruff_format"},
-                markdown = {"markdownlint-cli2"},
-                lua = {"lua-format"},
-                rust = {"rustfmt", "leptosfmt"}
-            },
-            format_on_save = false
-        },
-        init = function()
-            vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-
-            -- Create an autocmd for formatting on save except markdown
-            vim.api.nvim_create_autocmd("BufWritePre", {
-                pattern = "*",
-                callback = function(args)
-                    local ft = vim.api.nvim_buf_get_option(args.buf, "filetype")
-                    if ft ~= "markdown" then
-                        require("conform").format({
-                            async = false,
-                            lsp_fallback = true,
-                            bufnr = args.buf
-                        })
-                    end
-                end
-            })
-        end
-    }, -- make sure parent directories exist when creating files
-    {"jessarcher/vim-heritage", event = "VeryLazy"}, -- show indent lines
-    {
+    }, { -- show the registers when it is helpful
+        "junegunn/vim-peekaboo",
+        event = "VeryLazy"
+    }, { -- Rainbow color for parenthesis
+        "luochen1990/rainbow",
+        event = "VeryLazy"
+    }, { -- highlight todo comments
+        "folke/todo-comments.nvim",
+        dependencies = {"nvim-lua/plenary.nvim"},
+        config = function() require("todo-comments").setup {} end
+    }, { -- show indent lines
         "lukas-reineke/indent-blankline.nvim",
         main = "ibl",
         ---@module "ibl"
         ---@type ibl.config
         opts = {}
-    }, -- show the registers when it is helpful
-    {"junegunn/vim-peekaboo", event = "VeryLazy"},
-    -- Rainbow color for parenthesis
-    {"luochen1990/rainbow", event = "VeryLazy"},
-    -- improved handling of closing buffers
-    {
-        {
-            'mhinz/vim-sayonara',
-            cmd = 'Sayonara',
-            keys = {
-                {
-                    "<leader>q",
-                    ":Sayonara<CR>",
-                    desc = "Close buffer with Sayonara"
-                }, {
-                    "<leader>Q",
-                    ":Sayonara!<CR>",
-                    desc = "Close buffer with Sayonara but keep window"
-                }
-            }
-        }
-    }, -- additional targets in text
-    {"wellle/targets.vim", event = "VeryLazy"}, -- improved diagnostic windows
-    {
-        "rachartier/tiny-inline-diagnostic.nvim",
-        event = "VeryLazy",
-        priority = 1000,
-        config = function()
-            require("tiny-inline-diagnostic").setup()
-            vim.diagnostic.config({virtual_text = false}) -- Disable Neovim's default virtual text diagnostics
-        end
-    }, -- highlight todo comments
-    {
-        "folke/todo-comments.nvim",
-        dependencies = {"nvim-lua/plenary.nvim"},
-        config = function() require("todo-comments").setup {} end
-    }, -- Treesitter is a new parser generator tool that we can
-    -- use in Neovim to power faster and more accurate
-    -- syntax highlighting.
-    {
-        "nvim-treesitter/nvim-treesitter",
-        build = ":TSUpdate",
-        event = {"BufReadPost", "BufNewFile"},
-        cmd = {"TSUpdate", "TSInstall", "TSLog", "TSUninstall"},
-        opts = {
-            highlight = {enable = true},
-            indent = {enable = true},
-            ensure_installed = {
-                "bash", "diff", "dockerfile", "html", "javascript", "json",
-                "lua", "luadoc", "luap", "markdown", "markdown_inline",
-                "python", "regex", "rust", "toml", "vim", "vimdoc", "xml",
-                "yaml"
-            }
-        },
-        config = function(_, opts)
-            require("nvim-treesitter.configs").setup(opts)
-        end
-    }, {
-        "nvim-treesitter/nvim-treesitter-textobjects",
-        event = "BufReadPost",
-        opts = {
-            move = {
-                enable = true,
-                set_jumps = true,
-                goto_next_start = {
-                    ["]f"] = "@function.outer",
-                    ["]c"] = "@class.outer",
-                    ["]a"] = "@parameter.inner"
-                },
-                goto_next_end = {
-                    ["]F"] = "@function.outer",
-                    ["]C"] = "@class.outer",
-                    ["]A"] = "@parameter.inner"
-                },
-                goto_previous_start = {
-                    ["[f"] = "@function.outer",
-                    ["[c"] = "@class.outer",
-                    ["[a"] = "@parameter.inner"
-                },
-                goto_previous_end = {
-                    ["[F"] = "@function.outer",
-                    ["[C"] = "@class.outer",
-                    ["[A"] = "@parameter.inner"
-                }
-            }
-        },
-        config = function(_, opts)
-            require("nvim-treesitter.configs").setup({textobjects = opts})
-        end
-    }, -- automatic closing pairs
-    {'windwp/nvim-autopairs', event = "InsertEnter", config = true},
-    -- rust_with_rstml to allow for rust and html in treesitter (e.g. for
-    -- leptos). Use TSInstall rust_with_rstml if it is not working as expected
-    {
-        "rayliwell/tree-sitter-rstml",
-        dependencies = {"nvim-treesitter"},
-        build = ":TSUpdate",
-        config = function() require("tree-sitter-rstml").setup() end
-    }, -- Automatic tag closing and renaming (optional but highly recommended)
-    {
-        "windwp/nvim-ts-autotag",
-        dependencies = {'nvim-treesitter'},
-        config = function() require("nvim-ts-autotag").setup() end
-    }, {"mg979/vim-visual-multi", branch = "master", event = "VeryLazy"},
-    {"bronson/vim-visual-star-search", event = "VeryLazy"},
-    -- show key bindings help page
-    {
+    }, { -- show key bindings help page
         "folke/which-key.nvim",
         event = "VeryLazy",
         config = function() require("which-key").setup() end
-    }, -- file tree
-    {
+    }, { -- file tree
         "nvim-neo-tree/neo-tree.nvim",
         branch = "v3.x",
         dependencies = {
@@ -956,7 +559,596 @@ require("lazy").setup({
             })
             require("neo-tree").setup(opts)
         end
-    }, -- Smooth scrolling behavior
-    {"karb94/neoscroll.nvim", opts = {}}
+    }, -- Behavior improvements
+    { -- Smooth scrolling behavior
+        "karb94/neoscroll.nvim",
+        opts = {}
+    }, { -- quick navigation
+        'ggandor/leap.nvim',
+        config = function()
+            vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
+            vim.keymap.set('n', 'S', '<Plug>(leap-from-window)')
+        end
+    }, { -- better %
+        'andymass/vim-matchup',
+        config = function()
+            vim.g.matchup_matchparen_offscreen = {method = "popup"}
+        end
+    }, { -- auto-cd to root of git project
+        'notjedi/nvim-rooter.lua',
+        config = function() require('nvim-rooter').setup() end
+    }, -- Functional improvements
+    { -- fzf support
+        'ibhagwan/fzf-lua',
+        config = function()
+            -- stop putting a giant window over my editor
+            require'fzf-lua'.setup {
+                winopts = {
+                    split = "belowright 10new",
+                    preview = {hidden = true}
+                },
+                files = {
+                    -- file icons are distracting
+                    file_icons = false,
+                    -- git icons are nice
+                    git_icons = true,
+                    -- but don't mess up my anchored search
+                    _fzf_nth_devicons = true
+                },
+                buffers = {
+                    file_icons = false,
+                    git_icons = true
+                    -- no nth_devicons as we'll do that
+                    -- manually since we also use
+                    -- with-nth
+                },
+                fzf_opts = {
+                    -- no reverse view
+                    ["--layout"] = "default"
+                }
+            }
+            -- when using C-p for quick file open, pass the file list through
+            --
+            --   https://github.com/jonhoo/proximity-sort
+            --
+            -- to prefer files closer to the current file.
+            vim.keymap.set('', '<C-p>', function()
+                opts = {}
+                opts.cmd =
+                    'fd --color=never --hidden --type f --type l --exclude .git'
+                local base = vim.fn.fnamemodify(vim.fn.expand('%'), ':h:.:S')
+                if base ~= '.' then
+                    -- if there is no current file,
+                    -- proximity-sort can't do its thing
+                    opts.cmd = opts.cmd ..
+                                   (" | proximity-sort %s"):format(
+                                       vim.fn.shellescape(vim.fn.expand('%')))
+                end
+                opts.fzf_opts = {
+                    ['--scheme'] = 'path',
+                    ['--tiebreak'] = 'index',
+                    ["--layout"] = "default"
+                }
+                require'fzf-lua'.files(opts)
+            end)
+            -- use fzf to search buffers as well
+            vim.keymap.set('n', '<leader>;', function()
+                require'fzf-lua'.buffers({
+                    -- just include the paths in the fzf bits, and nothing else
+                    -- https://github.com/ibhagwan/fzf-lua/issues/2230#issuecomment-3164258823
+                    fzf_opts = {
+                        ["--with-nth"] = "{-3..-2}",
+                        ["--nth"] = "-1",
+                        ["--delimiter"] = "[:\u{2002}]",
+                        ["--header-lines"] = "false"
+                    },
+                    header = false
+                })
+            end)
+        end
+    }, { -- fuzzy finder
+        'nvim-telescope/telescope.nvim',
+        tag = 'v0.2.1',
+        dependencies = {
+            'nvim-lua/plenary.nvim', -- optional but recommended
+            {'nvim-telescope/telescope-fzf-native.nvim', build = 'make'}
+        },
+        config = function()
+            require("telescope").setup {
+                defaults = {
+                    layout_strategy = "bottom_pane",
+                    layout_config = {
+                        height = 0.5, -- use half of the editor height
+                        width = 1.0, -- full editor width
+                        prompt_position = "bottom"
+                    }
+                }
+            }
+            local builtin = require('telescope.builtin')
+            vim.keymap.set('n', '<leader>ff', builtin.find_files,
+                           {desc = 'Telescope find files'})
+            vim.keymap.set('n', '<leader>fg', builtin.live_grep,
+                           {desc = 'Telescope live grep'})
+            vim.keymap.set('n', '<leader>fb', builtin.buffers,
+                           {desc = 'Telescope buffers'})
+            vim.keymap.set('n', '<leader>fh', builtin.help_tags,
+                           {desc = 'Telescope help tags'})
+
+            vim.keymap.set('n', 'gd', builtin.lsp_definitions)
+            vim.keymap.set('n', 'gi', builtin.lsp_implementations)
+            vim.keymap.set('n', 'gr', builtin.lsp_references)
+            vim.keymap.set('n', 'gf', builtin.treesitter)
+        end
+    }, -- LSP stuff
+    { -- LSP config
+        'neovim/nvim-lspconfig',
+        dependencies = {"mason-org/mason.nvim"},
+        config = function()
+            -- Setup language servers.
+            -- Server-specific settings. See `:help lspconfig-setup`
+
+            -- Rust analyzer
+            if vim.fn.executable('rust-analyzer') == 1 then
+                vim.lsp.config('rust-analyzer', {
+                    cmd = {"rust-analyzer"},
+                    filetypes = {"rust"},
+                    settings = {
+                        ["rust-analyzer"] = {
+                            cargo = {features = "all"},
+                            checkOnSave = {enable = true},
+                            check = {command = "clippy"},
+                            imports = {group = {enable = false}},
+                            completion = {postfix = {enable = false}},
+                            procMacro = {
+                                ignored = {
+                                    leptos_macro = {
+                                        -- optional: --
+                                        -- "component",
+                                        "server"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+                vim.lsp.enable('rust_analyzer')
+            end
+
+            -- Bash LSP
+            if vim.fn.executable('bash-language-server') == 1 then
+                vim.lsp.config('bashls', {
+                    cmd = {"bash-language-server", "start"},
+                    filetypes = {"sh"}
+                })
+                vim.lsp.enable('bashls')
+            end
+
+            -- Ruff for Python
+            -- https://docs.astral.sh/ruff/installation/
+            if vim.fn.executable('ruff') == 1 then
+                vim.lsp.config('ruff', {
+                    cmd = {"ruff", "server"},
+                    filetypes = {"python"}
+                })
+                vim.lsp.enable('ruff')
+            end
+
+            -- Use ty for type checking
+            -- https://docs.astral.sh/ty/installation/
+            if vim.fn.executable('ty') == 1 then
+                vim.lsp.config('ty',
+                               {cmd = {"ty", "server"}, filetypes = {"python"}})
+                vim.lsp.enable('ty')
+            end
+
+            -- pyright for python
+            -- if vim.fn.executable('pyright') == 1 then
+            --     -- disable hover for ruff if pyright is found
+            --     if vim.fn.executable('ruff') == 1 then
+            --         vim.api.nvim_create_autocmd("LspAttach", {
+            --             group = vim.api.nvim_create_augroup(
+            --                 'lsp_attach_disable_ruff_hover', {clear = true}),
+            --             callback = function(args)
+            --                 local client =
+            --                     vim.lsp.get_client_by_id(args.data.client_id)
+            --                 if client == nil then
+            --                     return
+            --                 end
+            --                 if client.name == 'ruff' then
+            --                     -- Disable hover in favor of Pyright
+            --                     client.server_capabilities.hoverProvider = false
+            --                 end
+            --             end,
+            --             desc = 'LSP: Disable hover capability from Ruff'
+            --         })
+            --     end
+            --     vim.lsp.config('pyright', {
+            --         settings = {
+            --             pyright = {
+            --                 -- Using Ruff's importer organizer
+            --                 disableOrganizeImports = true
+            --             },
+            --             python = {
+            --                 analysis = {
+            --                     -- ignoer all files for analysis to exclusively use Ruff
+            --                     ignore = {'*'}
+            --                 }
+            --             }
+            --         }
+            --     })
+            --     vim.lsp.enable('pyright')
+            -- end
+
+            -- Markdown
+            if vim.fn.executable('marksman') == 1 then
+                vim.lsp.config('marksman', {
+                    cmd = {"marksman", "server"},
+                    filetypes = {"markdown"}
+                })
+                vim.lsp.enable('marksman')
+            end
+
+            -- Tailwind CSS
+            if vim.fn.executable("tailwindcss-language-server") == 1 then
+                vim.lsp.config("tailwindcss", {
+                    cmd = {"tailwindcss-language-server", "--stdio"},
+                    filetypes = {
+                        "html", "css", "scss", "javascript", "javascriptreact",
+                        "typescript", "typescriptreact", "svelte", "vue", "rust"
+                    },
+                    settings = {
+                        tailwindCSS = {includeLanguages = {rust = "html"}}
+                    },
+                    experimental = {
+                        classRegex = {
+                            -- Regex here because of rust cases like:
+                            -- div class=("bg-red-500", active.then(|| "text-white")) {}
+                            -- div class={format!("bg-{}", color)} {}
+                            {'class\\s*=\\s*"([^"]*)"'}, -- view! { class="..." }
+                            {'class\\s*=\\s*\\(([^)]*)\\)'}, -- class=("foo", bar)
+                            {'tw!\\("([^"]*)"\\)'} -- optional: tw!("...")
+                        }
+                    }
+                })
+
+                vim.lsp.enable("tailwindcss")
+            end
+
+            -- Harper-ls grammar checker
+            if vim.fn.executable('harper-ls') == 1 then
+                vim.lsp.config('harper-ls', {
+                    cmd = {"harper-ls", "--stdio"},
+                    filetypes = {"markdown", "text"}
+                })
+                vim.lsp.enable('harper-ls')
+            end
+
+            -- Vale for slidev slides grammar checking
+            if vim.fn.executable("vale-ls") == 1 then
+                vim.lsp.config("vale-ls", {
+                    cmd = {"vale-ls"},
+                    filetypes = {"slidev"},
+                    root_dir = vim.fs.root(0, {".vale.ini", ".git"})
+                })
+                vim.lsp.enable("vale-ls")
+            end
+
+            -- Global mappings.
+            -- See `:help vim.diagnostic.*` for documentation on any of the below functions
+            vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
+            vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+            vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+            vim.keymap.set('n', '<leader>el', vim.diagnostic.setloclist)
+
+            -- Use LspAttach autocommand to only map the following keys
+            -- after the language server attaches to the current buffer
+            vim.api.nvim_create_autocmd('LspAttach', {
+                group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+                callback = function(ev)
+                    -- Enable completion triggered by <c-x><c-o>
+                    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+
+                    -- Buffer local mappings.
+                    -- See `:help vim.lsp.*` for documentation on any of the below functions
+                    local opts = {buffer = ev.buf}
+                    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+                    -- These are handled with telescope
+                    -- vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+                    -- vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+                    -- vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+                    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+                    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help,
+                                   opts)
+                    vim.keymap.set('n', '<leader>wa',
+                                   vim.lsp.buf.add_workspace_folder, opts)
+                    vim.keymap.set('n', '<leader>wr',
+                                   vim.lsp.buf.remove_workspace_folder, opts)
+                    vim.keymap.set('n', '<leader>wl', function()
+                        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+                    end, opts)
+                    -- vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
+                    vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, opts)
+                    vim.keymap.set({'n', 'v'}, '<leader>a',
+                                   vim.lsp.buf.code_action, opts)
+                    vim.keymap.set('n', '<leader>f', function()
+                        vim.lsp.buf.format {async = true}
+                    end, opts)
+                    vim.keymap.set('n', 'g[', vim.diagnostic.goto_prev, opts)
+                    vim.keymap.set('n', 'g]', vim.diagnostic.goto_next, opts)
+
+                    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+
+                    -- TODO: find some way to make this only apply to the current line.
+                    if client.server_capabilities.inlayHintProvider then
+                        vim.lsp.inlay_hint.enable(false, {bufnr = bufnr})
+                    end
+
+                    -- None of this semantics tokens business.
+                    -- https://www.reddit.com/r/neovim/comments/143efmd/is_it_possible_to_disable_treesitter_completely/
+                    client.server_capabilities.semanticTokensProvider = nil
+
+                    -- format on save for Rust
+                    if client.server_capabilities.documentFormattingProvider then
+                        vim.api.nvim_create_autocmd("BufWritePre", {
+                            group = vim.api.nvim_create_augroup("RustFormat",
+                                                                {clear = true}),
+                            buffer = bufnr,
+                            callback = function()
+                                vim.lsp.buf.format({bufnr = bufnr})
+                            end
+                        })
+                    end
+                end
+            })
+        end
+    }, { -- LSP-based code-completion
+        "hrsh7th/nvim-cmp",
+        -- load cmp on InsertEnter
+        event = "InsertEnter",
+        -- these dependencies will only be loaded when cmp loads
+        -- dependencies are always lazy-loaded unless specified otherwise
+        dependencies = {
+            'neovim/nvim-lspconfig', "hrsh7th/cmp-nvim-lsp",
+            "hrsh7th/cmp-buffer", "hrsh7th/cmp-path"
+        },
+        config = function()
+            local cmp = require 'cmp'
+
+            cmp.setup({
+                snippet = {
+                    -- REQUIRED by nvim-cmp. get rid of it once we can
+                    expand = function(args)
+                        vim.snippet.expand(args.body)
+                    end
+                },
+                mapping = cmp.mapping.preset.insert({
+                    ["<S-Tab>"] = cmp.mapping.select_prev_item(),
+                    ["<Tab>"] = cmp.mapping.select_next_item(),
+                    ['<C-Space>'] = cmp.mapping.complete(),
+                    ['<C-e>'] = cmp.mapping.abort(),
+                    -- Accept currently selected item.
+                    -- Set `select` to `false` to only confirm explicitly selected items.
+                    ['<CR>'] = cmp.mapping.confirm({
+                        select = true,
+                        behavior = cmp.ConfirmBehavior.Insert
+                    })
+                }),
+                sources = cmp.config.sources({{name = 'nvim_lsp'}},
+                                             {{name = 'path'}}),
+                experimental = {ghost_text = true}
+            })
+
+            -- Enable completing paths in :
+            cmp.setup.cmdline(':',
+                              {sources = cmp.config.sources({{name = 'path'}})})
+        end
+    }, { -- inline function signatures
+        "ray-x/lsp_signature.nvim",
+        event = "VeryLazy",
+        opts = {},
+        config = function(_, opts)
+            -- Get signatures (and _only_ signatures) when in argument lists.
+            require"lsp_signature".setup({
+                doc_lines = 0,
+                handler_opts = {border = "none"}
+            })
+        end
+    }, -- language support
+    { -- yaml
+        "cuducos/yaml.nvim",
+        ft = {"yaml"},
+        dependencies = {"nvim-treesitter/nvim-treesitter"}
+    }, -- fish
+    'khaveesh/vim-fish-syntax', { -- markdown
+        'plasticboy/vim-markdown',
+        ft = {"markdown"},
+        dependencies = {'godlygeek/tabular'},
+        config = function()
+            -- never ever fold!
+            vim.g.vim_markdown_folding_disabled = 1
+            -- support front-matter in .md files
+            vim.g.vim_markdown_frontmatter = 1
+            -- 'o' on a list item should insert at same level
+            vim.g.vim_markdown_new_list_item_indent = 0
+            -- don't add bullets when wrapping:
+            -- https://github.com/preservim/vim-markdown/issues/232
+            vim.g.vim_markdown_auto_insert_bullets = 0
+        end
+    }, { -- commentary key binds and handling
+        "tpope/vim-commentary",
+        event = "VeryLazy"
+    }, { -- Improved formatting on save
+        "stevearc/conform.nvim",
+        event = {"BufWritePre"},
+        cmd = {"ConformInfo"},
+        keys = {
+            {
+                "<leader>l",
+                function()
+                    require("conform").format({
+                        async = true,
+                        lsp_fallback = true
+                    })
+                end,
+                desc = "Format buffer"
+            }
+        },
+        opts = {
+            formatters = {
+                prettier = {
+                    command = function()
+                        local buf = vim.api.nvim_buf_get_name(0)
+                        if buf == "" then
+                            return "prettier"
+                        end
+
+                        local dir = vim.fn.fnamemodify(buf, ":p:h")
+
+                        while dir and dir ~= "/" do
+                            local candidate = dir ..
+                                                  "/node_modules/.bin/prettier"
+                            if vim.fn.executable(candidate) == 1 then
+                                return candidate
+                            end
+
+                            local parent = vim.fn.fnamemodify(dir, ":h")
+                            if parent == dir then
+                                break
+                            end
+                            dir = parent
+                        end
+
+                        return "prettier"
+                    end
+                }
+            },
+            formatters_by_ft = {
+                python = {"ruff_format"},
+                markdown = {"markdownlint-cli2"},
+                slidev = {"prettier"},
+                lua = {"lua-format"},
+                rust = {"rustfmt", "leptosfmt"}
+            },
+            format_on_save = false
+        },
+        init = function()
+            vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+
+            -- Create an autocmd for formatting on save except markdown
+            vim.api.nvim_create_autocmd("BufWritePre", {
+                pattern = "*",
+                callback = function(args)
+                    local ft = vim.api.nvim_buf_get_option(args.buf, "filetype")
+                    if ft ~= "markdown" then
+                        require("conform").format({
+                            async = false,
+                            lsp_fallback = true,
+                            bufnr = args.buf
+                        })
+                    end
+                end
+            })
+        end
+    }, { -- make sure parent directories exist when creating files
+        "jessarcher/vim-heritage",
+        event = "VeryLazy"
+    }, { -- improved handling of closing buffers
+        {
+            'mhinz/vim-sayonara',
+            cmd = 'Sayonara',
+            keys = {
+                {
+                    "<leader>q",
+                    ":Sayonara<CR>",
+                    desc = "Close buffer with Sayonara"
+                }, {
+                    "<leader>Q",
+                    ":Sayonara!<CR>",
+                    desc = "Close buffer with Sayonara but keep window"
+                }
+            }
+        }
+    }, { -- additional targets in text
+        "wellle/targets.vim",
+        event = "VeryLazy"
+    }, { -- improved diagnostic windows
+        "rachartier/tiny-inline-diagnostic.nvim",
+        event = "VeryLazy",
+        priority = 1000,
+        config = function()
+            require("tiny-inline-diagnostic").setup()
+            vim.diagnostic.config({virtual_text = false}) -- Disable Neovim's default virtual text diagnostics
+        end
+    }, -- Treesitter is a new parser generator tool that we can
+    -- use in Neovim to power faster and more accurate
+    -- syntax highlighting.
+    {
+        "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate",
+        event = {"BufReadPost", "BufNewFile"},
+        cmd = {"TSUpdate", "TSInstall", "TSLog", "TSUninstall"},
+        opts = {
+            highlight = {enable = true},
+            indent = {enable = true},
+            ensure_installed = {
+                "bash", "diff", "dockerfile", "html", "javascript", "json",
+                "lua", "luadoc", "luap", "markdown", "markdown_inline",
+                "python", "regex", "rust", "toml", "vim", "vimdoc", "xml",
+                "yaml"
+            }
+        },
+        config = function(_, opts)
+            require("nvim-treesitter.configs").setup(opts)
+        end
+    }, {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        event = "BufReadPost",
+        opts = {
+            move = {
+                enable = true,
+                set_jumps = true,
+                goto_next_start = {
+                    ["]f"] = "@function.outer",
+                    ["]c"] = "@class.outer",
+                    ["]a"] = "@parameter.inner"
+                },
+                goto_next_end = {
+                    ["]F"] = "@function.outer",
+                    ["]C"] = "@class.outer",
+                    ["]A"] = "@parameter.inner"
+                },
+                goto_previous_start = {
+                    ["[f"] = "@function.outer",
+                    ["[c"] = "@class.outer",
+                    ["[a"] = "@parameter.inner"
+                },
+                goto_previous_end = {
+                    ["[F"] = "@function.outer",
+                    ["[C"] = "@class.outer",
+                    ["[A"] = "@parameter.inner"
+                }
+            }
+        },
+        config = function(_, opts)
+            require("nvim-treesitter.configs").setup({textobjects = opts})
+        end
+    }, { -- automatic closing pairs
+        'windwp/nvim-autopairs',
+        event = "InsertEnter",
+        config = true
+    }, { -- rust_with_rstml to allow for rust and html in treesitter (e.g. for
+        -- leptos). Use TSInstall rust_with_rstml if it is not working as expected
+        "rayliwell/tree-sitter-rstml",
+        dependencies = {"nvim-treesitter"},
+        build = ":TSUpdate",
+        config = function() require("tree-sitter-rstml").setup() end
+    },
+    { -- Automatic tag closing and renaming (optional but highly recommended)
+        "windwp/nvim-ts-autotag",
+        dependencies = {'nvim-treesitter'},
+        config = function() require("nvim-ts-autotag").setup() end
+    }, {"mg979/vim-visual-multi", branch = "master", event = "VeryLazy"},
+    {"bronson/vim-visual-star-search", event = "VeryLazy"}
+
 })
 
