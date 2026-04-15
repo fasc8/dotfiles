@@ -6,62 +6,69 @@ cd "$HOME"
 pck_mngr=""
 
 if command -v apt >/dev/null 2>&1; then
-  pck_mngr="apt"
+    pck_mngr="apt"
 elif command -v pacman -h >/dev/null 2>&1; then
-  pck_mngr="pacman"
+    pck_mngr="pacman"
 fi
 
 # If fish is default SHELL install fisher
 if [ "$SHELL" = "/usr/bin/fish" ]; then
-  if ! [ -f ~/.config/fish/functions/fisher.fish ]; then
-    echo "fish shell found: Install fisher"
-    fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
-    fish -c "fisher install IlanCosman/tide"
-    fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='No' --lean_prompt_height='Two lines' --prompt_connection=Disconnected --prompt_spacing=Sparse --icons='Few icons' --transient=No"
-  elif ! command -v fisher >/dev/null 2>&1; then
-    echo "fisher command not found. Install fisher."
-    rm ~/.config/fish/completions/fisher.fish
-    fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
-    fish -c "fisher install IlanCosman/tide"
-    fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='No' --lean_prompt_height='Two lines' --prompt_connection=Disconnected --prompt_spacing=Sparse --icons='Few icons' --transient=No"
-  fi
+    if ! [ -f ~/.config/fish/functions/fisher.fish ]; then
+        echo "fish shell found: Install fisher"
+        fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
+        fish -c "fisher install IlanCosman/tide"
+        fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='No' --lean_prompt_height='Two lines' --prompt_connection=Disconnected --prompt_spacing=Sparse --icons='Few icons' --transient=No"
+    elif ! command -v fisher >/dev/null 2>&1; then
+        echo "fisher command not found. Install fisher."
+        rm ~/.config/fish/completions/fisher.fish
+        fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
+        fish -c "fisher install IlanCosman/tide"
+        fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='No' --lean_prompt_height='Two lines' --prompt_connection=Disconnected --prompt_spacing=Sparse --icons='Few icons' --transient=No"
+    fi
 fi
 
-if ! command -v nvim >/dev/null 2>&1; then
-  echo "Bootstraping nVim"
-  curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-  ## Build from source
-  # Install prerequisites
-  if [ $pck_mngr = "apt" ]; then
+# Install build utils prerequisites
+if [ $pck_mngr = "apt" ]; then
     sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl
-  elif [ $pck_mngr = "pacman" ]; then
+elif [ $pck_mngr = "pacman" ]; then
     sudo pacman -S base-devel cmake unzip ninja tree-sitter curl
-  fi
+fi
 
-  mkdir /tmp/neovim
-  git clone https://github.com/neovim/neovim /tmp/neovim
-  cd /tmp/neovim
-  git checkout stable
-  make -j4 CMAKE_BUILD_TYPE=Release
-  sudo make install
-  rm -rf /tmp/neovim
+# Install nvim from sources
+if ! command -v nvim >/dev/null 2>&1; then
+    echo "Bootstraping nVim"
 
-  nvim --version
-  nvim '+PlugInstall' '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
+    mkdir /tmp/neovim
+    git clone https://github.com/neovim/neovim /tmp/neovim
+    cd /tmp/neovim
+    git checkout stable
+    make -j4 CMAKE_BUILD_TYPE=Release
+    sudo make install
+    rm -rf /tmp/neovim
 fi
 
 if command -v nvim >/dev/null 2>&1; then
-  echo "Update nvim plugins"
-  nvim '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
+    echo "Update nvim plugins"
+    nvim '+PlugInstall' '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
+    nvim '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
 fi
 
+# Install ov from sources
+if ! command -v ov >/dev/null 2>&1; then
+    echo "Bootstraping ov"
+
+    mkdir /tmp/ov
+    git clone https://github.com/noborus/ov.git /tmp/ov
+    cd /tmp/ov
+    make install
+    rm -rf /tmp/ov
+    ov --completion fish > ~/.config/fish/completions/ov.fish
+fi
 
 if [ $pck_mngr = "apt" ]; then
-  sudo apt install bat eza fd-find ripgrep fzf httpie
-  sudo ln -s /usr/bin/fdfind /usr/bin/fd
-  sudo ln -s /usr/bin/batcat /usr/bin/bat
+    sudo apt install bat eza fd-find ripgrep fzf httpie
+    sudo ln -s /usr/bin/fdfind /usr/bin/fd
+    sudo ln -s /usr/bin/batcat /usr/bin/bat
 elif [ $pck_mngr = "pacman" ]; then
-  sudo pacman -S bat exa fd ripgrep fzf sd httpie
+    sudo pacman -S bat exa fd ripgrep fzf sd httpie
 fi
