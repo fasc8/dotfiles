@@ -1029,6 +1029,8 @@ require("lazy").setup({
                 markdown = {"markdownlint-cli2"},
                 slidev = {"prettier"},
                 lua = {"lua-format"},
+                html = {"html_beautify"},
+                htmldjango = {"djlint"},
                 rust = {"rustfmt", "leptosfmt"}
             },
             format_on_save = false
