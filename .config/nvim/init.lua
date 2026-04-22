@@ -290,6 +290,12 @@ require("lazy").setup({
                             return vim.fn.executable("harper-ls") ~= 1
                         end
                     }, {
+                        "typescript-language-server",
+                        condition = function()
+                            return vim.fn.executable(
+                                       "typescript-language-server") ~= 1
+                        end
+                    }, {
                         "vale-ls",
                         condition = function()
                             return vim.fn.executable("vale-ls") ~= 1
@@ -814,6 +820,19 @@ require("lazy").setup({
                 })
 
                 vim.lsp.enable("tailwindcss")
+            end
+
+            -- typescript language server
+            if vim.fn.executable("typescript-language-server") == 1 then
+                vim.lsp.config("tsserver", {
+                    cmd = {'typescript-language-server', '--stdio'},
+                    filetypes = {
+                        "html", "css", "scss", "javascript", "javascriptreact",
+                        "typescript", "typescriptreact", "htmldjango"
+                    }
+                })
+
+                vim.lsp.enable("tsserver")
             end
 
             -- Harper-ls grammar checker
