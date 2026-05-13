@@ -47,10 +47,16 @@ else
         fzf_key_bindings
     end
 
+    if type -q zoxide
+        zoxide init fish | source
+    end
+
+    if type -q pipx
+        set PATH $PATH ~/.local/bin
+    end
+
     # Start X
     source $HOME/.config/fish/startx.fish &> /dev/null
 
 end
 
-# Created by `pipx` on 2025-11-22 19:07:33
-set PATH $PATH /home/fasc8/.local/bin

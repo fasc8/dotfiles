@@ -72,3 +72,7 @@ if [ $pck_mngr = "apt" ]; then
 elif [ $pck_mngr = "pacman" ]; then
     sudo pacman -S bat exa fd ripgrep fzf sd httpie
 fi
+
+# Install zoxide from script
+# WARNING: direct script curl. Handle with care
+curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh

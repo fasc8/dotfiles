@@ -74,4 +74,3 @@ abbr --add j 'jobs -l'
 
 # Get web server headers
 abbr --add header 'curl -I'
-
