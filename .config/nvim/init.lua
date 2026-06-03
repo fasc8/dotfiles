@@ -1148,8 +1148,8 @@ require("lazy").setup({
             ensure_installed = {
                 "bash", "diff", "dockerfile", "html", "javascript", "json",
                 "lua", "luadoc", "luap", "markdown", "markdown_inline",
-                "python", "regex", "rust", "strictdoc", "toml", "vim", "vimdoc",
-                "xml", "yaml"
+                "python", "regex", "rust", "rst", "strictdoc", "toml", "vim",
+                "vimdoc", "xml", "yaml"
             }
         },
         config = function(_, opts)
@@ -1167,8 +1167,7 @@ require("lazy").setup({
                 install_info = {
                     url = "https://github.com/manueldiagostino/tree-sitter-strictdoc",
                     branch = "main",
-                    files = {"src/parser.c"},
-                    queries = "queries"
+                    files = {"src/parser.c"}
                 },
                 filetype = "strictdoc"
             }
@@ -1215,7 +1214,8 @@ require("lazy").setup({
         dependencies = {"nvim-treesitter"},
         build = ":TSUpdate",
         config = function() require("tree-sitter-rstml").setup() end
-    },
+    }, -- Load strictdoc manually to have queries discoverable
+    {"manueldiagostino/tree-sitter-strictdoc", lazy = false},
     { -- Automatic tag closing and renaming (optional but highly recommended)
         "windwp/nvim-ts-autotag",
         dependencies = {'nvim-treesitter'},
