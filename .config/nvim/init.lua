@@ -1148,12 +1148,30 @@ require("lazy").setup({
             ensure_installed = {
                 "bash", "diff", "dockerfile", "html", "javascript", "json",
                 "lua", "luadoc", "luap", "markdown", "markdown_inline",
-                "python", "regex", "rust", "toml", "vim", "vimdoc", "xml",
-                "yaml"
+                "python", "regex", "rust", "strictdoc", "toml", "vim", "vimdoc",
+                "xml", "yaml"
             }
         },
         config = function(_, opts)
             require("nvim-treesitter.configs").setup(opts)
+        end,
+        init = function()
+            vim.filetype.add({
+                extension = {sdoc = "strictdoc", sgra = "strictdoc"}
+            })
+
+            local parser_config =
+                require("nvim-treesitter.parsers").get_parser_configs()
+
+            parser_config.strictdoc = {
+                install_info = {
+                    url = "https://github.com/manueldiagostino/tree-sitter-strictdoc",
+                    branch = "main",
+                    files = {"src/parser.c"},
+                    queries = "queries"
+                },
+                filetype = "strictdoc"
+            }
         end
     }, {
         "nvim-treesitter/nvim-treesitter-textobjects",
