@@ -519,7 +519,7 @@ require("lazy").setup({
                 filtered_items = {
                     visible = true, -- This is what you want: If you set this to `true`, all "hide" just mean "dimmed out"
                     hide_dotfiles = false,
-                    hide_gitignored = true
+                    hide_gitignored = false
                 }
             },
             window = {
@@ -705,8 +705,9 @@ require("lazy").setup({
                 }
             }
             local builtin = require('telescope.builtin')
-            vim.keymap.set('n', '<leader>ff', builtin.find_files,
-                           {desc = 'Telescope find files'})
+            vim.keymap.set('n', '<leader>ff', function()
+                builtin.find_files({hidden = true, no_ignore = true})
+            end, {desc = 'Telescope find files'})
             vim.keymap.set('n', '<leader>fg', builtin.live_grep,
                            {desc = 'Telescope live grep'})
             vim.keymap.set('n', '<leader>fb', builtin.buffers,
