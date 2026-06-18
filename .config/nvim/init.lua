@@ -1140,70 +1140,77 @@ require("lazy").setup({
     -- syntax highlighting.
     {
         "nvim-treesitter/nvim-treesitter",
-        build = ":TSUpdate",
-        event = {"BufReadPost", "BufNewFile"},
-        cmd = {"TSUpdate", "TSInstall", "TSLog", "TSUninstall"},
-        opts = {
-            highlight = {enable = true},
-            indent = {enable = true},
-            ensure_installed = {
+        branch = "main",
+        lazy = false,
+        build = function()
+            require("nvim-treesitter").install({
                 "bash", "diff", "dockerfile", "html", "javascript", "json",
                 "lua", "luadoc", "luap", "markdown", "markdown_inline",
-                "python", "regex", "rust", "rst", "strictdoc", "toml", "vim",
+                "python", "regex", "rust", "rst", "toml", "vim",
                 "vimdoc", "xml", "yaml"
-            }
-        },
-        config = function(_, opts)
-            require("nvim-treesitter.configs").setup(opts)
+            }):wait(300000)
         end,
+        cmd = {"TSUpdate", "TSInstall", "TSLog", "TSUninstall"},
         init = function()
             vim.filetype.add({
                 extension = {sdoc = "strictdoc", sgra = "strictdoc"}
             })
-
-            local parser_config =
-                require("nvim-treesitter.parsers").get_parser_configs()
-
-            parser_config.strictdoc = {
+            local parsers = require("nvim-treesitter.parsers")
+            parsers.strictdoc = {
                 install_info = {
                     url = "https://github.com/manueldiagostino/tree-sitter-strictdoc",
-                    branch = "main",
-                    files = {"src/parser.c"}
-                },
-                filetype = "strictdoc"
+                    branch = "main"
+                }
             }
+        end,
+        config = function()
+            require("nvim-treesitter").setup()
         end
     }, {
         "nvim-treesitter/nvim-treesitter-textobjects",
+        branch = "main",
         event = "BufReadPost",
-        opts = {
-            move = {
-                enable = true,
-                set_jumps = true,
-                goto_next_start = {
-                    ["]f"] = "@function.outer",
-                    ["]c"] = "@class.outer",
-                    ["]a"] = "@parameter.inner"
-                },
-                goto_next_end = {
-                    ["]F"] = "@function.outer",
-                    ["]C"] = "@class.outer",
-                    ["]A"] = "@parameter.inner"
-                },
-                goto_previous_start = {
-                    ["[f"] = "@function.outer",
-                    ["[c"] = "@class.outer",
-                    ["[a"] = "@parameter.inner"
-                },
-                goto_previous_end = {
-                    ["[F"] = "@function.outer",
-                    ["[C"] = "@class.outer",
-                    ["[A"] = "@parameter.inner"
-                }
-            }
-        },
-        config = function(_, opts)
-            require("nvim-treesitter.configs").setup({textobjects = opts})
+        config = function()
+            require("nvim-treesitter-textobjects").setup({
+                move = {set_jumps = true}
+            })
+            local move = require("nvim-treesitter-textobjects.move")
+            vim.keymap.set({"n", "x", "o"}, "]f", function()
+                move.goto_next_start("@function.outer", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "]c", function()
+                move.goto_next_start("@class.outer", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "]a", function()
+                move.goto_next_start("@parameter.inner", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "]F", function()
+                move.goto_next_end("@function.outer", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "]C", function()
+                move.goto_next_end("@class.outer", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "]A", function()
+                move.goto_next_end("@parameter.inner", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "[f", function()
+                move.goto_previous_start("@function.outer", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "[c", function()
+                move.goto_previous_start("@class.outer", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "[a", function()
+                move.goto_previous_start("@parameter.inner", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "[F", function()
+                move.goto_previous_end("@function.outer", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "[C", function()
+                move.goto_previous_end("@class.outer", "textobjects")
+            end)
+            vim.keymap.set({"n", "x", "o"}, "[A", function()
+                move.goto_previous_end("@parameter.inner", "textobjects")
+            end)
         end
     }, { -- automatic closing pairs
         'windwp/nvim-autopairs',
