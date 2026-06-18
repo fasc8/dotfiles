@@ -3,86 +3,119 @@
 # Because Git submodule commands cannot operate without a work tree, they must
 # be run from within $HOME (assuming this is the root of your dotfiles)
 cd "$HOME"
-pck_mngr=""
 
+pck_mngr=""
 if command -v apt >/dev/null 2>&1; then
     pck_mngr="apt"
-elif command -v pacman -h >/dev/null 2>&1; then
+elif command -v pacman >/dev/null 2>&1; then
     pck_mngr="pacman"
 fi
 
-# If fish is default SHELL install fisher
+# ── helpers ──────────────────────────────────────────────────────────────────
+
+# Collect apt package names that are not yet installed
+apt_missing() {
+    local missing=()
+    for pkg in "$@"; do
+        dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null \
+            | grep -q "install ok installed" || missing+=("$pkg")
+    done
+    echo "${missing[@]}"
+}
+
+# Collect pacman package names that are not yet installed
+pacman_missing() {
+    local missing=()
+    for pkg in "$@"; do
+        pacman -Q "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
+    done
+    echo "${missing[@]}"
+}
+
+# Install a cargo crate only if the binary is not already present
+# Usage: cargo_install <binary-name> [<crate-name>]
+cargo_install() {
+    command -v "$1" >/dev/null 2>&1 || cargo install "${2:-$1}"
+}
+
+# ── fish shell setup ──────────────────────────────────────────────────────────
 if [ "$SHELL" = "/usr/bin/fish" ]; then
     if ! [ -f ~/.config/fish/functions/fisher.fish ] || ! command -v fisher >/dev/null 2>&1; then
         echo "fish shell found: Install fisher"
         fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
     fi
-    if ! command -v tide >/dev/null 2>&1; then
+    if ! fish -c "type -q tide" >/dev/null 2>&1; then
         fish -c "fisher install IlanCosman/tide"
         fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='No' --lean_prompt_height='Two lines' --prompt_connection=Disconnected --prompt_spacing=Sparse --icons='Few icons' --transient=No"
     fi
 fi
 
-# Install build utils prerequisites
-if [ $pck_mngr = "apt" ]; then
-    sudo apt install ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl
-elif [ $pck_mngr = "pacman" ]; then
-    sudo pacman -S base-devel cmake unzip ninja tree-sitter curl
+# ── system packages ───────────────────────────────────────────────────────────
+if [ "$pck_mngr" = "apt" ]; then
+    read -ra missing <<< "$(apt_missing \
+        ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config \
+        unzip curl bat fd-find ripgrep fzf httpie eza golang-go)"
+    if [ ${#missing[@]} -gt 0 ] && [ -n "${missing[0]}" ]; then
+        sudo apt install -y "${missing[@]}"
+    fi
+    [ -e /usr/bin/fd ]  || sudo ln -s /usr/bin/fdfind /usr/bin/fd
+    [ -e /usr/bin/bat ] || sudo ln -s /usr/bin/batcat /usr/bin/bat
+elif [ "$pck_mngr" = "pacman" ]; then
+    read -ra missing <<< "$(pacman_missing \
+        base-devel cmake unzip ninja curl bat exa fd ripgrep fzf sd httpie go)"
+    if [ ${#missing[@]} -gt 0 ] && [ -n "${missing[0]}" ]; then
+        sudo pacman -S --noconfirm "${missing[@]}"
+    fi
 fi
 
-# Install nvim from sources
+# ── neovim ────────────────────────────────────────────────────────────────────
 if ! command -v nvim >/dev/null 2>&1; then
-    echo "Bootstraping nVim"
-
-    mkdir /tmp/neovim
-    git clone https://github.com/neovim/neovim /tmp/neovim
-    cd /tmp/neovim
-    git checkout stable
-    make -j4 CMAKE_BUILD_TYPE=Release
-    sudo make install
-    cd ~
+    echo "Bootstrapping neovim"
+    (
+        git clone https://github.com/neovim/neovim /tmp/neovim
+        cd /tmp/neovim
+        git checkout stable
+        make -j4 CMAKE_BUILD_TYPE=Release
+        sudo make install
+    )
     rm -rf /tmp/neovim
 fi
 
 if command -v nvim >/dev/null 2>&1; then
-    echo "Update nvim plugins"
-    nvim '+PlugInstall' '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
-    nvim '+PlugUpdate' '+PlugClean!' '+PlugUpdate' '+qall'
+    echo "Syncing nvim plugins"
+    nvim --headless "+Lazy! sync" +qa
 fi
 
-# Install ov from sources
+# ── ov ────────────────────────────────────────────────────────────────────────
 if ! command -v ov >/dev/null 2>&1; then
-    echo "Bootstraping ov"
-
-    mkdir /tmp/ov
-    git clone https://github.com/noborus/ov.git /tmp/ov
-    cd /tmp/ov
-    make install
+    echo "Bootstrapping ov"
+    (
+        git clone https://github.com/noborus/ov.git /tmp/ov
+        cd /tmp/ov
+        make install
+    )
     rm -rf /tmp/ov
-    ov --completion fish > ~/.config/fish/completions/ov.fish
+    command -v ov >/dev/null 2>&1 \
+        && ov --completion fish > ~/.config/fish/completions/ov.fish
 fi
 
-if [ $pck_mngr = "apt" ]; then
-    sudo apt install bat eza fd-find ripgrep fzf httpie
-    sudo ln -s /usr/bin/fdfind /usr/bin/fd
-    sudo ln -s /usr/bin/batcat /usr/bin/bat
-elif [ $pck_mngr = "pacman" ]; then
-    sudo pacman -S bat exa fd ripgrep fzf sd httpie
-fi
-
-# Install zoxide from script
-# WARNING: direct script curl. Handle with care
-if ! command -v z >/dev/null 2>&1; then
+# ── zoxide ────────────────────────────────────────────────────────────────────
+if ! command -v zoxide >/dev/null 2>&1; then
     curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
 fi
 
-# Install rustup for cargo install and rust in general
-# WARNING: direct script curl. Handle with care
+# ── rust + cargo tools ────────────────────────────────────────────────────────
 if ! command -v rustup >/dev/null 2>&1; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 fi
 rustup update
 
-if ! command -v tuicr >/dev/null 2>&1; then
-    cargo install tuicr
+cargo_install tuicr
+cargo_install tree-sitter tree-sitter-cli
+
+# ── nvim treesitter parsers ───────────────────────────────────────────────────
+# Runs after tree-sitter-cli is available so the build hook can compile parsers
+if command -v nvim >/dev/null 2>&1 && command -v tree-sitter >/dev/null 2>&1; then
+    echo "Building nvim-treesitter parsers"
+    nvim --headless "+Lazy! build nvim-treesitter" +qa
 fi
