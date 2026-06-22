@@ -32,10 +32,34 @@ pacman_missing() {
     echo "${missing[@]}"
 }
 
-# Install a cargo crate only if the binary is not already present
+# Install a cargo crate only if the binary is not already present.
+# Returns 0 if a fresh install occurred, 1 if already present.
 # Usage: cargo_install <binary-name> [<crate-name>]
 cargo_install() {
-    command -v "$1" >/dev/null 2>&1 || cargo install "${2:-$1}"
+    if command -v "$1" >/dev/null 2>&1; then
+        return 1
+    fi
+    cargo install "${2:-$1}"
+}
+
+# Prompt yes/no; returns 0 (true) if user answers y/Y
+# Usage: prompt_yn "Question text"
+prompt_yn() {
+    local reply
+    read -r -p "$1 [y/N] " reply
+    [[ "$reply" =~ ^[Yy]$ ]]
+}
+
+# Build and install neovim stable from source
+nvim_build_from_source() {
+    (
+        git clone https://github.com/neovim/neovim /tmp/neovim
+        cd /tmp/neovim
+        git checkout stable
+        make -j"$(nproc)" CMAKE_BUILD_TYPE=Release
+        sudo make install
+    )
+    rm -rf /tmp/neovim
 }
 
 # ── fish shell setup ──────────────────────────────────────────────────────────
@@ -68,17 +92,22 @@ elif [ "$pck_mngr" = "pacman" ]; then
     fi
 fi
 
+# ── nvm ───────────────────────────────────────────────────────────────────────
+if [ ! -d "$HOME/.nvm" ]; then
+    echo "Installing nvm"
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+fi
+# Load nvm for the rest of this script
+export NVM_DIR="$HOME/.nvm"
+# shellcheck source=/dev/null
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 # ── neovim ────────────────────────────────────────────────────────────────────
 if ! command -v nvim >/dev/null 2>&1; then
-    echo "Bootstrapping neovim"
-    (
-        git clone https://github.com/neovim/neovim /tmp/neovim
-        cd /tmp/neovim
-        git checkout stable
-        make -j4 CMAKE_BUILD_TYPE=Release
-        sudo make install
-    )
-    rm -rf /tmp/neovim
+    echo "Bootstrapping neovim from source"
+    nvim_build_from_source
+elif prompt_yn "Rebuild neovim from source to get the latest stable version?"; then
+    nvim_build_from_source
 fi
 
 if command -v nvim >/dev/null 2>&1; then
@@ -107,15 +136,30 @@ fi
 # ── rust + cargo tools ────────────────────────────────────────────────────────
 if ! command -v rustup >/dev/null 2>&1; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+else
+    rustup update
 fi
-rustup update
 
 cargo_install tuicr
 cargo_install tree-sitter tree-sitter-cli
 
-# ── nvim treesitter parsers ───────────────────────────────────────────────────
-# Runs after tree-sitter-cli is available so the build hook can compile parsers
-if command -v nvim >/dev/null 2>&1 && command -v tree-sitter >/dev/null 2>&1; then
-    echo "Building nvim-treesitter parsers"
-    nvim --headless "+Lazy! build nvim-treesitter" +qa
+# ── agent skills ─────────────────────────────────────────────────────────────
+if prompt_yn "Install agent skills via npx skills?"; then
+    export NODE_OPTIONS="--use-system-ca"
+
+    # caveman family (source: JuliusBrussee/caveman)
+    # includes: caveman, caveman-commit, caveman-compress, caveman-help,
+    #           caveman-review, caveman-stats
+    npx skills add -y JuliusBrussee/caveman
+
+    # cavecrew + cavekit-* (source: JuliusBrussee/caveman-code)
+    # includes: cavecrew, cavekit-design-system, cavekit-methodology,
+    #           cavekit-revision, cavekit-validation-first
+    npx skills add -y JuliusBrussee/caveman-code
+
+    # brainstorm (source: obra/superpowers, skill: brainstorming)
+    npx skills add -y obra/superpowers@brainstorming
+
+    # grill-me / grilling (source: mattpocock/skills, skill: grilling)
+    npx skills add -y mattpocock/skills@grilling
 fi
