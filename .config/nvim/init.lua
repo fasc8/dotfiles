@@ -1145,7 +1145,11 @@ require("lazy").setup({
         build = ":TSUpdate",
         init = function()
             vim.filetype.add({
-                extension = {sdoc = "strictdoc", sgra = "strictdoc"}
+                extension = {sdoc = "strictdoc", sgra = "strictdoc"},
+                pattern = {
+                    [".*/lecture_.*%.md$"] = "slidev",
+                    [".*/pages/.*%.md$"] = "slidev",
+                },
             })
         end,
         config = function()
@@ -1177,6 +1181,11 @@ require("lazy").setup({
                     "rust", "toml", "vim", "vimdoc", "xml", "yaml", "strictdoc"
                 },
                 callback = function() vim.treesitter.start() end
+            })
+            -- slidev files are Markdown; use the markdown parser explicitly
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = {"slidev"},
+                callback = function() vim.treesitter.start(0, "markdown") end
             })
         end
     }, {
