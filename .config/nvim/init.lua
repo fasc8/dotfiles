@@ -1142,29 +1142,42 @@ require("lazy").setup({
         "nvim-treesitter/nvim-treesitter",
         branch = "main",
         lazy = false,
-        build = function()
-            require("nvim-treesitter").install({
-                "bash", "diff", "dockerfile", "html", "javascript", "json",
-                "lua", "luadoc", "luap", "markdown", "markdown_inline",
-                "python", "regex", "rust", "rst", "toml", "vim",
-                "vimdoc", "xml", "yaml"
-            }):wait(300000)
-        end,
-        cmd = {"TSUpdate", "TSInstall", "TSLog", "TSUninstall"},
+        build = ":TSUpdate",
         init = function()
             vim.filetype.add({
                 extension = {sdoc = "strictdoc", sgra = "strictdoc"}
             })
-            local parsers = require("nvim-treesitter.parsers")
-            parsers.strictdoc = {
-                install_info = {
-                    url = "https://github.com/manueldiagostino/tree-sitter-strictdoc",
-                    branch = "main"
-                }
-            }
         end,
         config = function()
+            -- Custom parser registration must happen in a User TSUpdate autocmd
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "TSUpdate",
+                callback = function()
+                    require("nvim-treesitter.parsers").strictdoc = {
+                        install_info = {
+                            url = "https://github.com/manueldiagostino/tree-sitter-strictdoc",
+                            branch = "main"
+                        }
+                    }
+                end
+            })
             require("nvim-treesitter").setup()
+            require("nvim-treesitter").install {
+                "bash", "diff", "dockerfile", "html", "javascript", "json",
+                "lua", "luadoc", "luap", "markdown", "markdown_inline",
+                "python", "regex", "rust", "rst", "toml", "vim", "vimdoc",
+                "xml", "yaml"
+            }
+            -- Highlighting is NOT automatic in the new main branch; must be
+            -- enabled explicitly per filetype via vim.treesitter.start()
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = {
+                    "bash", "diff", "dockerfile", "html", "javascript", "json",
+                    "lua", "luadoc", "markdown", "python", "regex", "rst",
+                    "rust", "toml", "vim", "vimdoc", "xml", "yaml", "strictdoc"
+                },
+                callback = function() vim.treesitter.start() end
+            })
         end
     }, {
         "nvim-treesitter/nvim-treesitter-textobjects",
