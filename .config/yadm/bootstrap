@@ -142,6 +142,7 @@ fi
 
 cargo_install tuicr
 cargo_install tree-sitter tree-sitter-cli
+cargo_install rustnet-monitor
 
 # ── agent skills ─────────────────────────────────────────────────────────────
 if prompt_yn "Install agent skills via npx skills?"; then
