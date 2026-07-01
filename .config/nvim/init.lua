@@ -710,8 +710,8 @@ require("lazy").setup({
                     hidden = true,
                     no_ignore = true,
                     file_ignore_patterns = {
-                        "node_modules", "dist", "__pycache__", ".venv", ".git",
-                        ".vscode"
+                        "node_modules/", "dist/", "__pycache__/", ".venv/",
+                        ".git/", ".vscode/"
                     }
                 })
             end, {desc = 'Telescope find files'})
