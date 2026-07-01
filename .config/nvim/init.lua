@@ -706,7 +706,14 @@ require("lazy").setup({
             }
             local builtin = require('telescope.builtin')
             vim.keymap.set('n', '<leader>ff', function()
-                builtin.find_files({hidden = true, no_ignore = true})
+                builtin.find_files({
+                    hidden = true,
+                    no_ignore = true,
+                    file_ignore_patterns = {
+                        "node_modules", "dist", "__pycache__", ".venv", ".git",
+                        ".vscode"
+                    }
+                })
             end, {desc = 'Telescope find files'})
             vim.keymap.set('n', '<leader>fg', builtin.live_grep,
                            {desc = 'Telescope live grep'})
@@ -1148,8 +1155,8 @@ require("lazy").setup({
                 extension = {sdoc = "strictdoc", sgra = "strictdoc"},
                 pattern = {
                     [".*/lecture_.*%.md$"] = "slidev",
-                    [".*/pages/.*%.md$"] = "slidev",
-                },
+                    [".*/pages/.*%.md$"] = "slidev"
+                }
             })
         end,
         config = function()
@@ -1185,7 +1192,9 @@ require("lazy").setup({
             -- slidev files are Markdown; use the markdown parser explicitly
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = {"slidev"},
-                callback = function() vim.treesitter.start(0, "markdown") end
+                callback = function()
+                    vim.treesitter.start(0, "markdown")
+                end
             })
         end
     }, {
