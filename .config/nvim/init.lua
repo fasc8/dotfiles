@@ -897,8 +897,12 @@ require("lazy").setup({
             -- Global mappings.
             -- See `:help vim.diagnostic.*` for documentation on any of the below functions
             vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
-            vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-            vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+            vim.keymap.set('n', '[d', function()
+                vim.diagnostic.jump({count = -1, float = true})
+            end)
+            vim.keymap.set('n', ']d', function()
+                vim.diagnostic.jump({count = 1, float = true})
+            end)
             vim.keymap.set('n', '<leader>el', vim.diagnostic.setloclist)
 
             -- Use LspAttach autocommand to only map the following keys
@@ -934,8 +938,12 @@ require("lazy").setup({
                     vim.keymap.set('n', '<leader>f', function()
                         vim.lsp.buf.format {async = true}
                     end, opts)
-                    vim.keymap.set('n', 'g[', vim.diagnostic.goto_prev, opts)
-                    vim.keymap.set('n', 'g]', vim.diagnostic.goto_next, opts)
+                    vim.keymap.set('n', 'g[', function()
+                        vim.diagnostic.jump({count = -1, float = true})
+                    end)
+                    vim.keymap.set('n', 'g]', function()
+                        vim.diagnostic.jump({count = 1, float = true})
+                    end)
 
                     local client = vim.lsp.get_client_by_id(ev.data.client_id)
 
