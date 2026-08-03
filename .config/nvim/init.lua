@@ -189,7 +189,8 @@ vim.keymap.set("i", ",,", "<Esc>A,<Esc>", {noremap = true})
 --
 -------------------------------------------------------------------------------
 -- Allow virtual text
-vim.diagnostic.config({virtual_text = true, virtual_lines = false})
+-- disabled due to using rachartier/tiny-inline-diagnostic.nvim
+-- vim.diagnostic.config({virtual_text = true, virtual_lines = false})
 
 -------------------------------------------------------------------------------
 --
@@ -355,13 +356,30 @@ require("lazy").setup({
                             return vim.fn.executable("luarocks") == 1 and
                                        vim.fn.executable("lua-format") ~= 1
                         end
-                    }
-                    -- {
+                    }, -- {
                     --     "leptosfmt",
                     --     condition = function()
                     --         return vim.fn.executable("leptosfmt") ~= 1
                     --     end
-                    -- }
+                    -- } -- ======================
+                    -- DEBUGGING
+                    -- ======================
+                    {
+                        "codelldb",
+                        condition = function()
+                            return vim.fn.executable("codelldb") ~= 1
+                        end
+                    }, {
+                        "js-debug-adapter@v1.76.1",
+                        condition = function()
+                            return vim.fn.executable("js-debug-adapter") ~= 1
+                        end
+                    }, {
+                        "bash-debug-adapter",
+                        condition = function()
+                            return vim.fn.executable("bash-debug-adapter") ~= 1
+                        end
+                    }
                 },
 
                 auto_update = false,
@@ -1120,6 +1138,197 @@ require("lazy").setup({
                 end
             })
         end
+    }, { -- Debug Adapter Protocol
+        "mfussenegger/nvim-dap",
+        lazy = true,
+        dependencies = {
+            "rcarriga/nvim-dap-ui", "nvim-neotest/nvim-nio", -- required by dap-ui
+            "theHamsta/nvim-dap-virtual-text", "mfussenegger/nvim-dap-python", {
+                "mason-org/mason.nvim",
+                opts = function(_, opts)
+                    opts.ensure_installed = opts.ensure_installed or {}
+                    vim.list_extend(opts.ensure_installed, {"debugpy"})
+                end
+            }
+        },
+        keys = {
+            {
+                "<F5>",
+                function() require("dap").continue() end,
+                desc = "Debug: Continue"
+            }, {
+                "<leader>so",
+                function() require("dap").step_over() end,
+                desc = "Debug: Step Over"
+            }, {
+                "<leader>si",
+                function() require("dap").step_into() end,
+                desc = "Debug: Step Into"
+            }, {
+                "<leader>sO",
+                function() require("dap").step_out() end,
+                desc = "Debug: Step Out"
+            }, {
+                "<leader>sc",
+                function() require("dap").run_to_cursor() end,
+                desc = "Debug: Run to Cursor"
+            }, {
+                "<leader>db",
+                function() require("dap").toggle_breakpoint() end,
+                desc = "Toggle Breakpoint"
+            }, {
+                "<leader>dB",
+                function()
+                    require("dap").set_breakpoint(vim.fn.input("Condition: "))
+                end,
+                desc = "Conditional Breakpoint"
+            },
+            {
+                "<leader>dr",
+                function() require("dap").repl.open() end,
+                desc = "Open REPL"
+            },
+            {
+                "<leader>dl",
+                function() require("dap").run_last() end,
+                desc = "Run Last"
+            }, {
+                "<leader>du",
+                function() require("dapui").toggle() end,
+                desc = "Toggle Debug UI"
+            },
+            {
+                "<leader>dt",
+                function() require("dap").terminate() end,
+                desc = "Terminate"
+            }
+        },
+        config = function()
+            local dap, dapui = require("dap"), require("dapui")
+
+            dapui.setup()
+            require("nvim-dap-virtual-text").setup()
+
+            dap.listeners.after.event_initialized["dapu i_config"] = function()
+                dapui.open()
+            end
+            dap.listeners.before.event_terminated["dapu i_config"] = function()
+                dapui.close()
+            end
+            dap.listeners.before.event_exited["dapui_co nfig"] = function()
+                dapui.close()
+            end
+
+            vim.fn.sign_define("DapBreakpoint",
+                               {text = "●", texthl = "DiagnosticSignError"})
+            vim.fn.sign_define("DapStopped",
+                               {text = "▶", texthl = "DiagnosticSignWarn"})
+
+            -- ===== Python =====
+            -- Requires uv setup with at least:
+            -- [dependency-groups]
+            -- dev = [
+            --     "debugpy==1.8.21",
+            -- ]
+
+            require("dap-python").setup("uv")
+
+            -- ===== Rust (via codelldb) =====
+            dap.adapters.codelldb = {
+                type = "server",
+                port = "${port}",
+                executable = {
+                    command = vim.fn.exepath("codelldb"),
+                    args = {"--port", "${port}"}
+                }
+            }
+            dap.configurations.rust = {
+                {
+                    name = "Launch",
+                    type = "codelldb",
+                    request = "launch",
+                    program = function()
+                        return vim.fn.input("Path to executable: ", vim.fn
+                                                .getcwd() .. "/target/debug/",
+                                            "file")
+                    end,
+                    cwd = "${workspaceFolder}",
+                    stopOnEntry = false
+                }
+            }
+
+            -- ===== JavaScript / TypeScript (via js-debug-adapter) =====
+            dap.adapters["pwa-node"] = {
+                type = "server",
+                host = "localhost",
+                port = "${port}",
+                executable = {
+                    command = "node",
+                    args = {
+                        vim.fn.stdpath("data") ..
+                            "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js",
+                        "${port}", "localhost"
+                    }
+                }
+            }
+
+            for _, lang in ipairs({
+                "javascript", "typescript", "javascriptreact", "typescriptreact"
+            }) do
+                dap.configurations[lang] = {
+                    {
+                        type = "pwa-node",
+                        request = "launch",
+                        name = "Launch file",
+                        program = "${file}",
+                        cwd = "${workspaceFolder}"
+                    }, {
+                        type = "pwa-node",
+                        request = "attach",
+                        name = "Attach to process",
+                        processId = require("dap.utils").pick_process,
+                        cwd = "${workspaceFolder}"
+                    }
+                    -- , {
+                    --     type = "pwa-msedge",
+                    --     request = "launch",
+                    --     name = "Start Edge with localhost",
+                    --     url = "http://localhost:3000",
+                    --     webRoot = "${workspaceFolder}"
+                    -- }
+                }
+            end
+
+            -- ===== Bash =====
+            dap.adapters.bashdb = {
+                type = "executable",
+                command = vim.fn.exepath("bash-debug-adapter"),
+                name = "bashdb"
+            }
+            dap.configurations.sh = {
+                {
+                    type = "bashdb",
+                    request = "launch",
+                    name = "Launch file",
+                    showDebuggingOutput = true,
+                    pathBashdb = vim.fn.stdpath("data") ..
+                        "/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb",
+                    pathBashdbLib = vim.fn.stdpath("data") ..
+                        "/mason/packages/bash-debug-adapter/extension/bashdb_dir",
+                    trace = true,
+                    file = "${file}",
+                    program = "${file}",
+                    cwd = "${workspaceFolder}",
+                    pathCat = "cat",
+                    pathBash = "/bin/bash",
+                    pathMkfifo = "mkfifo",
+                    pathPkill = "pkill",
+                    args = {},
+                    env = {},
+                    terminalKind = "integrated"
+                }
+            }
+        end
     }, { -- make sure parent directories exist when creating files
         "jessarcher/vim-heritage",
         event = "VeryLazy"
@@ -1148,7 +1357,7 @@ require("lazy").setup({
         priority = 1000,
         config = function()
             require("tiny-inline-diagnostic").setup()
-            vim.diagnostic.config({virtual_text = false}) -- Disable Neovim's default virtual text diagnostics
+            vim.diagnostic.config({virtual_text = false, virtual_lines = false}) -- Disable Neovim's default virtual text diagnostics
         end
     }, -- Treesitter is a new parser generator tool that we can
     -- use in Neovim to power faster and more accurate
