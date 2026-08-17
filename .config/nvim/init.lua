@@ -1110,13 +1110,14 @@ require("lazy").setup({
                 }
             },
             formatters_by_ft = {
-                python = {"ruff_format"},
-                markdown = {"markdownlint-cli2"},
-                slidev = {"prettier"},
-                lua = {"lua-format"},
                 html = {"html_beautify"},
                 htmldjango = {"djlint"},
-                rust = {"rustfmt", "leptosfmt"}
+                lua = {"lua-format"},
+                markdown = {"markdownlint-cli2"},
+                python = {"ruff_format"},
+                rust = {"rustfmt", "leptosfmt"},
+                slidev = {"prettier"},
+                typescriptreact = {"prettier"}
             },
             format_on_save = false
         },
