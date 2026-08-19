@@ -307,6 +307,11 @@ require("lazy").setup({
                             return vim.fn.executable("bash-language-server") ~=
                                        1
                         end
+                    }, {
+                        "tinymist",
+                        condition = function()
+                            return vim.fn.executable("tinymist") ~= 1
+                        end
                     }, -- {
                     --     "pyright",
                     --     condition = function()
@@ -908,6 +913,23 @@ require("lazy").setup({
                     cmd = {"vale-ls"},
                     filetypes = {"slidev"},
                     root_dir = vim.fs.root(0, {".vale.ini", ".git"})
+                })
+                vim.lsp.enable("vale-ls")
+            end
+
+            -- tinymist for typst support
+            if vim.fn.executable("tinymist") == 1 then
+                vim.lsp.config("tinymist", {
+                    cmd = {"tinymist"},
+                    filetypes = {"typst"},
+                    settings = {
+                        formatterMode = "typstyle",
+                        formatterProseWrap = true,
+                        formatterPrintWidth = 80,
+                        formatterIndentSize = 4,
+                        exportPdf = "onSave"
+                        -- semanticTokens = "disable"
+                    }
                 })
                 vim.lsp.enable("vale-ls")
             end
@@ -1571,6 +1593,12 @@ require("lazy").setup({
             -- Text object
             map({'o', 'x'}, 'ih', gitsigns.select_hunk)
         end
+    }, {
+        -- Typst live preview
+        'chomosuke/typst-preview.nvim',
+        lazy = false,
+        version = '1.*',
+        opts = {}
     }
 
 })
