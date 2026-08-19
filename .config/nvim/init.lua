@@ -1,3 +1,5 @@
+-- when logging is necessary uncomment
+-- vim.lsp.set_log_level("debug")
 -- always set leader first!
 vim.keymap.set("n", "<Space>", "<Nop>", {silent = true})
 vim.g.mapleader = " "
@@ -308,7 +310,7 @@ require("lazy").setup({
                                        1
                         end
                     }, {
-                        "tinymist",
+                        "tinymist", -- or install via cargo install --git https://github.com/Myriad-Dreamin/tinymist --locked tinymist-cli
                         condition = function()
                             return vim.fn.executable("tinymist") ~= 1
                         end
@@ -920,15 +922,20 @@ require("lazy").setup({
             -- tinymist for typst support
             if vim.fn.executable("tinymist") == 1 then
                 vim.lsp.config("tinymist", {
-                    cmd = {"tinymist"},
+                    cmd = {"tinymist", "lsp"},
                     filetypes = {"typst"},
+                    root_dir = vim.fs.root(0, {".git", "typst.toml"}) or
+                        vim.fn.getcwd(),
                     settings = {
-                        formatterMode = "typstyle",
-                        formatterProseWrap = true,
-                        formatterPrintWidth = 80,
-                        formatterIndentSize = 4,
-                        exportPdf = "onSave"
-                        -- semanticTokens = "disable"
+                        tinymist = {
+                            formatterMode = "typstyle",
+                            formatterProseWrap = true,
+                            formatterPrintWidth = 80,
+                            formatterIndentSize = 4,
+                            exportPdf = "onSave",
+                            lint = {enable = true, when = "onType"}
+                            -- semanticTokens = "disable"
+                        }
                     }
                 })
                 vim.lsp.enable("tinymist")
