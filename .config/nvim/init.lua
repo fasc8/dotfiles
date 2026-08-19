@@ -931,7 +931,7 @@ require("lazy").setup({
                         -- semanticTokens = "disable"
                     }
                 })
-                vim.lsp.enable("vale-ls")
+                vim.lsp.enable("tinymist")
             end
 
             -- Global mappings.
