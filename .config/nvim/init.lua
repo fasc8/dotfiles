@@ -13,13 +13,16 @@ vim.g.mapleader = " "
 vim.opt.foldenable = false
 vim.opt.foldmethod = 'manual'
 vim.opt.foldlevelstart = 99
+-- never ever conceal stuff
+vim.opt.conceallevel = 0
+vim.o.conceallevel = 0
 
 -- keep more context on screen while scrolling
-vim.opt.scrolloff = 8
-vim.opt.sidescrolloff = 8
+vim.opt.scrolloff = 12
+vim.opt.sidescrolloff = 12
 --
 -- never show me line breaks if they're not there
-vim.opt.wrap = false
+vim.opt.wrap = true
 
 -- always draw sign column. prevents buffer moving when adding/deleting sign
 vim.opt.signcolumn = "yes:2"
@@ -45,6 +48,7 @@ vim.opt.wildmode = 'list:longest'
 -- don't suggest files like there:
 vim.opt.wildignore =
     '.hg,.svn,*~,*.png,*.jpg,*.gif,*.min.js,*.swp,*.o,vendor,dist,_site'
+
 -- tabs: go big or go home
 vim.opt.shiftwidth = 4
 vim.opt.softtabstop = 4
@@ -57,9 +61,6 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 -- never ever make my terminal beep
 vim.opt.vb = true
--- never ever conceal stuff
-vim.opt.conceallevel = 0
-vim.o.conceallevel = 0
 
 -- more useful diffs (nvim -d)
 --- by ignoring whitespace
@@ -70,15 +71,10 @@ vim.opt.diffopt:append('iwhite')
 --- https://luppeng.wordpress.com/2020/10/10/when-to-use-each-of-the-git-diff-algorithms/
 vim.opt.diffopt:append('algorithm:histogram')
 vim.opt.diffopt:append('indent-heuristic')
+
 -- show a column at 80 characters as a guide for long lines
 vim.opt.colorcolumn = '80'
---- except in Rust where the rule is 100 characters
-vim.api.nvim_create_autocmd('Filetype',
-                            {pattern = 'rust', command = 'set colorcolumn=100'})
-vim.api.nvim_create_autocmd('Filetype', {
-    pattern = 'markdown',
-    command = 'set colorcolumn='
-})
+
 -- show more hidden characters
 -- also, show tabs nicer
 vim.opt.listchars = 'tab:^ ,nbsp:¬,extends:»,precedes:«,trail:•'
@@ -154,7 +150,7 @@ vim.keymap.set('n', 'g*', 'g*zz', {silent = true})
 -- "very magic" (less escaping needed) regexes by default
 vim.keymap.set('n', '?', '?\\v')
 vim.keymap.set('n', '/', '/\\v')
-vim.keymap.set('c', '%s/', '%sm/')
+vim.keymap.set('c', '%s/', '%sm/\\v')
 -- open new file adjacent to current file
 vim.keymap.set('n', '<leader>o', ':e <C-R>=expand("%:p:h") . "/" <cr>')
 -- no arrow keys --- force yourself to use the home row
@@ -199,6 +195,15 @@ vim.keymap.set("i", ",,", "<Esc>A,<Esc>", {noremap = true})
 -- autocommands
 --
 -------------------------------------------------------------------------------
+--- Set the colorcolumn
+--- except in Rust where the rule is 100 characters
+vim.api.nvim_create_autocmd('Filetype',
+                            {pattern = 'rust', command = 'set colorcolumn=100'})
+--- except no colorcolumn in markdown
+vim.api.nvim_create_autocmd('Filetype', {
+    pattern = 'markdown',
+    command = 'set colorcolumn='
+})
 -- highlight yanked text
 vim.api.nvim_create_autocmd('TextYankPost', {
     pattern = '*',
@@ -225,7 +230,7 @@ vim.api.nvim_create_autocmd('InsertLeave',
 
 vim.api.nvim_create_user_command("FixWhitespace", ":%s/\\s\\+$//e", {})
 vim.api.nvim_create_user_command("MarkdownTableFix",
-                                 "! tr -s ' ' | column -t -s '|' -o '|'",
+                                 "! tr -s ' ' | column -t -s '|' -o '|' | sed 's/^[[:blank:]]*//'",
                                  {range = true})
 
 -------------------------------------------------------------------------------
