@@ -377,7 +377,8 @@ require("lazy").setup({
                             return vim.fn.executable("codelldb") ~= 1
                         end
                     }, {
-                        "js-debug-adapter@v1.76.1",
+                        -- "js-debug-adapter@v1.76.1",
+                        "js-debug-adapter",
                         condition = function()
                             return vim.fn.executable("js-debug-adapter") ~= 1
                         end

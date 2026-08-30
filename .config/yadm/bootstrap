@@ -86,7 +86,8 @@ if [ "$pck_mngr" = "apt" ]; then
     [ -e /usr/bin/bat ] || sudo ln -s /usr/bin/batcat /usr/bin/bat
 elif [ "$pck_mngr" = "pacman" ]; then
     read -ra missing <<< "$(pacman_missing \
-        base-devel cmake unzip ninja curl bat exa fd ripgrep fzf sd httpie go)"
+        base-devel cmake unzip ninja curl bat exa fd ripgrep fzf sd httpie go \
+        btop htop imv)"
     if [ ${#missing[@]} -gt 0 ] && [ -n "${missing[0]}" ]; then
         sudo pacman -S --noconfirm "${missing[@]}"
     fi
