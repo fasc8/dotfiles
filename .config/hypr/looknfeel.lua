@@ -1,17 +1,22 @@
 -- Change the default Omarchy look'n'feel.
-
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#general
--- hl.config({
---   general = {
---     -- No gaps between windows or borders.
---     gaps_in = 0,
---     gaps_out = 0,
---     border_size = 0,
---
---     -- Change to niri-like side-scrolling layout.
---     layout = "scrolling",
---   },
--- })
+local active_border_color = {
+    colors = {"rgba(6597ca)", "rgba(00ff99ee)"},
+    angle = 45
+}
+local inactive_border_color = "rgba(595959aa)"
+
+hl.config({
+    general = {
+        -- No gaps between windows or borders.
+        gaps_in = 1,
+        gaps_out = 1,
+        border_size = 1
+
+        -- Change to niri-like side-scrolling layout.
+        -- layout = "scrolling"
+    }
+})
 
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#decoration
 -- hl.config({
@@ -34,12 +39,12 @@
 -- })
 
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#layout
--- hl.config({
---   layout = {
---     -- Avoid overly wide single-window layouts on wide screens.
---     single_window_aspect_ratio = { 1, 1 },
---   },
--- })
+hl.config({
+    layout = {
+        -- Avoid overly wide single-window layouts on wide screens.
+        single_window_aspect_ratio = {16, 9}
+    }
+})
 
 -- https://wiki.hypr.land/Configuring/Layouts/Scrolling-Layout/
 -- hl.config({
