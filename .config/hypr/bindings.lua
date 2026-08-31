@@ -22,3 +22,16 @@
 -- o.bind("SUPER + PERIOD", nil, "omarchy-shell shell toggle omarchy.emojis")
 hl.unbind("SUPER + SHIFT + O")
 o.bind("SUPER + SHIFT + O", "Joplin", "joplin")
+
+hl.unbind("SUPER + L")
+hl.unbind("SUPER + J")
+hl.unbind("SUPER + K")
+o.bind("SUPER + SHIFT + L", "Toggle workspace layout",
+       "omarchy-hyprland-workspace-layout-toggle")
+o.bind("SUPER + SHIFT + J", "Toggle window split", hl.dsp.layout("togglesplit"))
+o.bind("SUPER + SHIFT + K", "Keybindings", "omarchy-menu-keybindings")
+
+o.bind("SUPER + H", "Focus on left window", hl.dsp.focus({direction = "l"}))
+o.bind("SUPER + L", "Focus on right window", hl.dsp.focus({direction = "r"}))
+o.bind("SUPER + K", "Focus on above window", hl.dsp.focus({direction = "u"}))
+o.bind("SUPER + J", "Focus on below window", hl.dsp.focus({direction = "d"}))
