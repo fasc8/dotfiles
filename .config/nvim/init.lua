@@ -167,6 +167,11 @@ vim.keymap.set('i', '<right>', '<nop>')
 -- let the left and right arrows be useful: they can switch buffers
 vim.keymap.set('n', '<left>', ':bp<cr>')
 vim.keymap.set('n', '<right>', ':bn<cr>')
+-- " Use alt-[hjkl] to select the active split!
+vim.keymap.set('n', '<M-k>', ':wincmd k<CR>')
+vim.keymap.set('n', '<M-j>', ':wincmd j<CR>')
+vim.keymap.set('n', '<M-h>', ':wincmd h<CR>')
+vim.keymap.set('n', '<M-l>', ':wincmd l<CR>')
 -- make j and k move by visual line, not actual line, when text is soft-wrapped
 vim.keymap.set('n', 'j', 'gj')
 vim.keymap.set('n', 'k', 'gk')
