@@ -144,24 +144,3 @@ fi
 cargo_install tuicr
 cargo_install tree-sitter tree-sitter-cli
 cargo_install rustnet-monitor
-
-# ── agent skills ─────────────────────────────────────────────────────────────
-if prompt_yn "Install agent skills via npx skills?"; then
-    export NODE_OPTIONS="--use-system-ca"
-
-    # caveman family (source: JuliusBrussee/caveman)
-    # includes: caveman, caveman-commit, caveman-compress, caveman-help,
-    #           caveman-review, caveman-stats
-    npx skills add -y JuliusBrussee/caveman
-
-    # cavecrew + cavekit-* (source: JuliusBrussee/caveman-code)
-    # includes: cavecrew, cavekit-design-system, cavekit-methodology,
-    #           cavekit-revision, cavekit-validation-first
-    npx skills add -y JuliusBrussee/caveman-code
-
-    # brainstorm (source: obra/superpowers, skill: brainstorming)
-    npx skills add -y obra/superpowers@brainstorming
-
-    # grill-me / grilling (source: mattpocock/skills, skill: grilling)
-    npx skills add -y mattpocock/skills@grilling
-fi
