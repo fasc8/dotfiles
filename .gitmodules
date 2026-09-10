@@ -1,0 +1,6 @@
+[submodule ".config/omarchy/plugins/crmne.hyprmoncfg"]
+	path = .config/omarchy/plugins/crmne.hyprmoncfg
+	url = https://github.com/crmne/omarchy-hyprmoncfg.git
+[submodule ".config/omarchy/plugins/io.github.rizmi.portwatch"]
+	path = .config/omarchy/plugins/io.github.rizmi.portwatch
+	url = https://github.com/Rizmi/omarchy-portwatch-squre.git

@@ -144,3 +144,8 @@ fi
 cargo_install tuicr
 cargo_install tree-sitter tree-sitter-cli
 cargo_install rustnet-monitor
+
+if prompt_yn "Initialize omarchy plugins via yadm submodules?"; then
+    echo "Initializing submodules..."
+    yadm submodule update --init --recursive
+fi
