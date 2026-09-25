@@ -78,7 +78,7 @@ fi
 if [ "$pck_mngr" = "apt" ]; then
     read -ra missing <<< "$(apt_missing \
         ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config \
-        unzip curl bat fd-find ripgrep fzf httpie eza golang-go)"
+        unzip curl bat fd-find ripgrep fzf httpie eza golang-go btop)"
     if [ ${#missing[@]} -gt 0 ] && [ -n "${missing[0]}" ]; then
         sudo apt install -y "${missing[@]}"
     fi
@@ -87,7 +87,7 @@ if [ "$pck_mngr" = "apt" ]; then
 elif [ "$pck_mngr" = "pacman" ]; then
     read -ra missing <<< "$(pacman_missing \
         base-devel cmake unzip ninja curl bat exa fd ripgrep fzf sd httpie go \
-        btop htop imv)"
+        btop htop imv btop)"
     if [ ${#missing[@]} -gt 0 ] && [ -n "${missing[0]}" ]; then
         sudo pacman -S --noconfirm "${missing[@]}"
     fi
