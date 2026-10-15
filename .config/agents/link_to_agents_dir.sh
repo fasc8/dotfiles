@@ -23,21 +23,14 @@ for dir in "$source_dir"/*/; do
     name=${dir%/}
     name=${name##*/}
 
-    link="$target_dir/$name"
-    target="$dir"
+    destination="$target_dir/$name"
 
-    if [[ -L "$link" ]]; then
-        if [[ "$(readlink "$link")" == "$target" ]]; then
-            printf 'Skipping: %s -> %s\n' "$link" "$target"
-        else
-            printf 'Replacing: %s -> %s\n' "$link" "$target"
-            ln -sfn -- "$target" "$link"
-        fi
-    elif [[ -e "$link" ]]; then
-        printf 'Error: %s exists and is not a symlink\n' "$link" >&2
-        exit 1
+    if [[ -e "$destination" || -L "$destination" ]]; then
+        printf 'Replacing: %s with a copy of %s\n' "$destination" "$dir"
+        rm -rf -- "$destination"
     else
-        printf 'Creating: %s -> %s\n' "$link" "$target"
-        ln -s -- "$target" "$link"
+        printf 'Copying: %s to %s\n' "$dir" "$destination"
     fi
+
+    cp -a -- "$dir" "$destination"
 done
