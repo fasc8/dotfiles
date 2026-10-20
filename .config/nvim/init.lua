@@ -1397,7 +1397,26 @@ require("lazy").setup({
         event = "VeryLazy",
         priority = 1000,
         config = function()
-            require("tiny-inline-diagnostic").setup()
+            require("tiny-inline-diagnostic").setup({
+                preset = "modern",
+                options = {
+                    show_source = {enabled = false, if_many = false},
+                    show_code = true,
+                    add_messages = {
+                        messages = true,
+                        display_count = false,
+                        use_max_severity = false,
+                        show_multiple_glyphs = true
+                    },
+                    multilines = {enabled = false, always_show = false},
+                    show_all_diags_on_cursorline = false,
+                    show_diags_only_under_cursor = false,
+                    show_related = {enabled = true, max_count = 3},
+                    enable_on_insert = false,
+                    enable_on_select = false,
+                    override_open_float = true
+                }
+            })
             vim.diagnostic.config({virtual_text = false, virtual_lines = false}) -- Disable Neovim's default virtual text diagnostics
         end
     }, -- Treesitter is a new parser generator tool that we can
@@ -1620,4 +1639,3 @@ require("lazy").setup({
     }
 
 })
-
