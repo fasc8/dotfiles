@@ -1,0 +1,17 @@
+{
+  "$schema": "https://pi.dev/schemas/models.schema.json",
+  "providers": {
+    "vllm": {
+      "baseUrl": "http://192.168.2.67:18020/v1",
+      "api": "openai-completions",
+      "apiKey": "vllm",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": false
+      },
+      "models": [
+            { "id": "qwen3.8-27b" }
+      ]
+    }
+  }
+}
