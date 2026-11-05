@@ -2,7 +2,7 @@
   "$schema": "https://pi.dev/schemas/models.schema.json",
   "providers": {
     "vllm": {
-      "baseUrl": "http://192.168.2.67:18020/v1",
+      "baseUrl": "http://192.168.2.66:18020/v1",
       "api": "openai-completions",
       "apiKey": "vllm",
       "compat": {
@@ -10,7 +10,12 @@
         "supportsReasoningEffort": false
       },
       "models": [
-            { "id": "qwen3.8-27b" }
+        {
+          "id": "qwen3.8-27b",
+          "name": "Qwen 3.8 27B",
+          "reasoning": true,
+          "contextWindow": 65536
+        }
       ]
     }
   }
