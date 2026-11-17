@@ -14,7 +14,7 @@
           "id": "qwen3.8-27b",
           "name": "Qwen 3.8 27B",
           "reasoning": true,
-          "contextWindow": 65536
+          "contextWindow": 122900
         }
       ]
     }

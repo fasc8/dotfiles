@@ -1,34 +1,39 @@
 {
-  "version": 1,
-  "idle": {
-    "screensaver": 600,
-    "lock": 1200
-  },
   "bar": {
-    "position": "top",
-    "transparent": true,
-    "centerAnchor": "omarchy.clock",
+    "background": "glassy",
     "layout": {
-      "left": [
-        {
-          "id": "omarchy.menu"
-        },
-        {
-          "id": "omarchy.workspaces"
-        }
-      ],
       "center": [
         {
-          "id": "omarchy.indicators"
-        },
-        {
-          "id": "omarchy.clock",
           "format": "dddd HH:mm",
           "formatAlt": "d MMMM 'W'ww yyyy",
+          "id": "omarchy.clock",
           "verticalFormat": "HH\n—\nmm"
-        },
+        }
+      ],
+      "centerBegin": [
         {
-          "id": "omarchy.keyboard-layout"
+          "id": "omarchy.indicators"
+        }
+      ],
+      "centerEnd": [
+        {
+          "cities": [
+            {
+              "name": "Berlin",
+              "zone": "Europe/Berlin"
+            },
+            {
+              "lat": 12.97194,
+              "lon": 77.59369,
+              "name": "Bengaluru",
+              "region": "Karnataka, IN",
+              "zone": "Asia/Kolkata"
+            }
+          ],
+          "hour24": true,
+          "id": "omarchy.elsewhen",
+          "offsetMode": "home",
+          "units": "C"
         },
         {
           "id": "omarchy.weather"
@@ -37,7 +42,21 @@
           "id": "omarchy.system-update"
         }
       ],
+      "left": [
+        {
+          "id": "omarchy.menu"
+        },
+        {
+          "id": "omarchy.workspaces"
+        }
+      ],
       "right": [
+        {
+          "id": "omarchy.tray"
+        },
+        {
+          "id": "omarchy.keyboard-layout"
+        },
         {
           "id": "omarchy.agents"
         },
@@ -49,9 +68,6 @@
         },
         {
           "id": "omarchy.bluetooth"
-        },
-        {
-          "id": "omarchy.tray"
         },
         {
           "id": "omarchy.network"
@@ -67,7 +83,13 @@
           "showPercentage": true
         }
       ]
-    }
+    },
+    "position": "top"
   },
-  "plugins": []
+  "idle": {
+    "lock": 1200,
+    "screensaver": 600
+  },
+  "plugins": [],
+  "version": 1
 }
