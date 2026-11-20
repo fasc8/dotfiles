@@ -12,7 +12,7 @@ The tickets are not a list of steps. They are a **task graph** with blocking rel
 
 Communication to and from subagents should be sparse. Communicate primarily through **context pointers**: to the spec, tickets, research notes, and previous commits. Don't duplicate information already available via pointers.
 
-**Implementer subagents** should be run in the background where possible for maximum concurrency.
+Run implementer subagents in the background where possible for maximum concurrency.
 
 ## Steps
 
@@ -22,7 +22,7 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 3. Create the integration branch.
 
-4. Use **implementer subagents** to implement each ticket, each in its own worktree on its own branch. Each implementer subagent:
+4. Use a fresh **implementer subagent** for each ticket, each in its own worktree on its own branch. Each implementer subagent:
    - Confirms its worktree is based on the integration branch before starting, and resets onto it if not;
    - Loads the `tdd` skill and uses it to build the ticket;
    - Merges the integration branch tip into its own branch before reporting done

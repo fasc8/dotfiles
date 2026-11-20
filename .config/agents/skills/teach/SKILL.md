@@ -11,6 +11,8 @@ The user has asked you to teach them something. This is a stateful request - the
 
 Treat the current directory as a teaching workspace. The state of their learning is captured in this directory in several files:
 
+Paths such as `./lessons/`, `./reference/`, `./assets/`, and `./learning-records/` are relative to the directory where `/teach` was run. Resolve `*-FORMAT.md` links relative to this skill folder.
+
 - `MISSION.md`: A document capturing the _reason_ the user is interested in the topic. This should be used to ground all teaching. Use the format in [MISSION-FORMAT.md](./MISSION-FORMAT.md).
 - `./reference/*.html`: A directory of reference materials. These are the compressed learnings from the lessons - cheat sheets, reference algorithms, syntax, yoga poses, glossaries. They are the raw units of learning. They should be beautiful documents which print out well, and are designed for quick reference.
 - `RESOURCES.md`: A list of resources which can be explored to ground your teaching in contextual knowledge, or to acquire knowledge and wisdom. Use the format in [RESOURCES-FORMAT.md](./RESOURCES-FORMAT.md).

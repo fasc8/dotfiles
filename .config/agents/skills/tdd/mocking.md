@@ -25,8 +25,6 @@ Pass external dependencies in rather than creating them internally:
 // Easy to mock
 function processPayment(order, paymentClient) {
   return paymentClient.charge(order.total);
-.STRIPE_KEY);
-  return client.charge(order.total);
 }
 ```
 
@@ -57,7 +55,6 @@ The SDK approach means:
 ```typescript
 // Hard to mock
 function processPayment(order) {
-  const client = new StripeClient(process.env
+  const client = new StripeClient(process.env.STRIPE_KEY);
+  return client.charge(order.total);
 }
-
-```

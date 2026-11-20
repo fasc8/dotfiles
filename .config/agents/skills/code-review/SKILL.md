@@ -25,12 +25,13 @@ Before going further, confirm the fixed point resolves (`git rev-parse <fixed-po
 Look for the originating spec, in this order:
 
 1. A path the user passed as an argument.
-2. A spec file under `docs/`, `specs/`, or `.map/<feature>`, or `.scratch` matching the branch name or feature.
-3. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
+2. Issue references in commit messages between the fixed point and `HEAD`. Fetch the referenced issue from the configured tracker and use it as the spec source. If the reference is ambiguous, ask the user.
+3. A spec file under `docs/`, `specs/`, or `.map/<feature>`, or `.scratch` matching the branch name or feature.
+4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
 
 ### 3. Identify the standards sources
 
-Anything in the repo that documents how code should be written, such as `CODING_STANDARDS.md` or `CONTRIBUTING.md`.
+Search the whole repo for every file that documents how code should be written. When `CODING_STANDARDS.md` or `CONTRIBUTING.md` exists, it must be on the list.
 
 On top of whatever the repo documents, the Standards axis always carries the **smell baseline** below: a fixed set of Fowler code smells (_Refactoring_, ch.3) that applies even when a repo documents nothing. Two rules bind it:
 
@@ -53,6 +54,8 @@ Each smell reads *what it is* -> *how to fix*; match it against the diff:
 - **Refused Bequest**: a subclass or implementer that ignores or overrides most of what it inherits. -> drop the inheritance, use composition.
 
 ### 4. Spawn both sub-agents in parallel
+
+Start each sub-agent in a fresh context window.
 
 **Standards sub-agent prompt** should include:
 
