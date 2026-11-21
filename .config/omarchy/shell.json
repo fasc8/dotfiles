@@ -82,7 +82,8 @@
           "id": "omarchy.power",
           "showPercentage": true
         }
-      ]
+      ],
+      "tray": []
     },
     "position": "top"
   },
