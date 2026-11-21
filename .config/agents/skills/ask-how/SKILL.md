@@ -1,16 +1,28 @@
 ---
-name: ask-matt
-description: A router over the local skill set. Use when the user asks which skill fits a task, what to use for a given prompt, or how the skills and flows connect. Finds the right skill or flow and the order to run them in.
+name: ask-how
+description: Explains the best route to a stated goal through the skills in this directory: which skills, in what order, and why.
 disable-model-invocation: true
 ---
 
-# Ask Matt
+# Ask How
 
-You don't remember every skill, so ask. Given a prompt — a task, a situation, a phrase — this map finds the skill that fits, and when the work spans more than one skill, the sequence that fits.
+You don't remember every skill, so ask. Given a **goal** — the outcome you want to reach — this map explains the best route through the skills in this directory: where to start, the order, what each step hands to the next, and where the work crosses a context boundary. It explains the route; you run it.
 
 Before stating what a skill does or recommending a step be skipped, read that skill's SKILL.md: the summaries here are for orientation only.
 
 The map is a tree: one **main flow**, **on-ramps** that merge onto it, **standalone** skills, and a **vocabulary layer** underneath. A new skill joins one of those, or a new section — see [Extending this map](#extending-this-map) at the end.
+
+## Shape of the answer
+
+A goal earns an explanation, not a pointer. A complete answer has five parts:
+
+1. **The goal, read back** — the outcome, and what *done* looks like. If the goal is fuzzy enough to route two ways, ask the two or three questions that pick the destination first; the route follows the destination, never the other way around.
+2. **The inventory** — this skill's directory is the source of truth, not this map. List the sibling skill folders and read each frontmatter (name, description): that is the live list, so a skill added to the directory is picked up with no edit here. The map below is a cache of how the skills **chain** — the order, the branches, the handoffs — which no frontmatter carries. A skill missing from the map is read from its own SKILL.md and routed by its description.
+3. **The route** — the skills in order, each with a line: what it takes, what it hands to the next step, and why it is that one here.
+4. **The branches** — where the route splits on a condition not yet known (the size of the build, whether a question needs a runnable answer, whether a human has to be in the loop), and what decides which way.
+5. **The boundaries and the first read** — where the context stays, gets compacted, or is handed off ([Phase boundaries](#phase-boundaries)); and the SKILL.md of the first skill on the route, which the user reads before running it.
+
+A route may shorten the map, never silently: if a load-bearing step (the spec, the review, the retro) is out of the route, say so, and what skipping it costs.
 
 ## The main flow: idea → ship
 
@@ -106,18 +118,12 @@ Off the main flow entirely.
 
 ## Writing standards
 
-The layers of the written word, from always-on to document-level:
+The layers of the written word, from reply to document:
 
 - **`/unslop`** — always applied, never invoked: it cuts AI tells and ambiguity from any writing, including chat replies. The plain-language core (one instruction per sentence, 20/25 caps, active voice with a real actor, one word one meaning, status-first reporting) runs underneath every other skill.
+- **`/caveman`** — the reply-level layer: ultra-compressed communication mode (lite / full / ultra, with wenyan variants) that cuts output tokens while keeping technical accuracy.
 - **`/technical-writing`** — the document-level layer: Diátaxis structure, Google developer style sentences, STE instruction rules, Global English syntax. For documents that get published, not replies.
 - **`/writing-for-agents`** — the reference for writing documents agents consume: skills, AGENTS.md, pointed-at docs.
-
-## System and desktop
-
-- **`/omarchy`** — end-user customization of the Linux desktop, window manager, or system config: Hyprland window rules, the shell, terminals, themes, display, appearance.
-- **`/omarchy-app`** — build a new Omarchy desktop app the way Omarchy's own apps are built: C++ and Qt Quick, compiled with qmake6, installed as an Arch package so it shows up in the app launcher.
-- **`/diagnose-crash`** — diagnose why a program crashed on this machine, from a systemd-coredump core dump.
-- **`/caveman`** — ultra-compressed communication mode (lite / full / ultra, with wenyan variants): cuts output tokens while keeping technical accuracy.
 
 ## Vocabulary underneath
 
@@ -144,10 +150,12 @@ There is no automatic setup skill on this machine. The flows assume a repo-local
 
 ## Extending this map
 
-This file is the map; the skills are the territory. Adding a skill adds one line:
+The directory is the territory; this file is the map. A new skill in the directory is **already in scope**: the inventory step reads the live list, so a skill that stands alone costs no edit here.
 
-- The line names the skill in backticks, in the voice of its section, with one or two sentences: when you reach for it, and what it hands back.
-- It goes in the section that fits — the main flow, an on-ramp, disciplines, the adversarial layer, visuals, standalone, writing, or system. A skill that fits none of them starts a new section; the sections are the only structure, and the tree survives as long as the sections stay coarse.
+A line in the map is earned when the skill **chains**: when it sits in a flow, hands off to another skill, or decides a branch. Adding such a skill adds one line:
+
+- The line names the skill in backticks, in the voice of its section, with one or two sentences: when you reach for it, and what it hands to the next step.
+- It goes in the section that fits — the main flow, an on-ramp, codebase health, disciplines, the adversarial layer, visuals, standalone, writing, or vocabulary. A skill that fits none of them starts a new section; the sections are the only structure, and the tree survives as long as the sections stay coarse.
 - If the new skill changes how work gets built or reviewed, edit the main-flow step, not just the section — the flow is the load-bearing part of the map.
 
-Keep lines at orientation level: each skill's own SKILL.md is the source of truth, and this map only decides which one to read.
+Keep lines at orientation level: each skill's own SKILL.md is the source of truth, and the line decides which one to read and where it sits in the route.
