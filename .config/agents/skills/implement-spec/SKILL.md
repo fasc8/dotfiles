@@ -36,3 +36,7 @@ Run implementer subagents in the background where possible for maximum concurren
 8. Resolve each ticket the way the issue tracker closes work, and report the integration branch.
 
 9. Clean up all **implementer subagent** worktrees.
+
+## New internal APIs
+
+When the spec introduces a new internal API while old callers still exist: migrate the callers and delete the old API in the same wave — no compatibility layers. Update the tests to assert the new contract, and delete tests that only protected pre-refactor implementation details. This applies when there are no external users depending on backward compatibility and the project can absorb the coordinated breaking change.

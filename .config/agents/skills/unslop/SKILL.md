@@ -1,6 +1,6 @@
 ---
 name: unslop
-description: Cut AI tells from any writing. Must always apply.
+description: Cut AI tells and ambiguity from any writing: voice rules plus a plain-language core (one instruction per sentence, 20/25 caps, active voice with a real actor, one word one meaning, no semicolons or phrasal verbs, hedges preserved, status-first reporting). Must always apply.
 ---
 
 # Unslop
@@ -24,6 +24,42 @@ Removing patterns is half the job. Sterile, voiceless writing is just as obvious
 - **Use "I" when it fits.** First person isn't unprofessional.
 - **Let some mess in.** Perfect structure looks machine-made.
 - **Be specific.** Not "this is concerning" but "there's something unsettling about agents churning away at 3am."
+
+## Plain-language discipline (STE core, always on)
+
+These rules apply to everything you write for the user, including chat replies. They fix ambiguity, not style: apply the structure rules everywhere; apply the vocabulary lockdown only where the text is procedural or machine-facing (commands, error text, inter-agent instructions). Voice and soul still apply wherever the mode allows it. A procedure does not get opinions; an explanation does.
+
+a. **One instruction per sentence.** One thought per sentence everywhere else.
+
+b. **Sentence caps.** 20 words for instructions, 25 for descriptions. Split, never delete: ask which proposition needs its own sentence, not which words can go. If a sentence cannot be split without losing precision, keep it and say what would have been lost. One `Kept as-is:` line is the only permitted addition to a rewrite.
+
+c. **Condition before command**, comma after the condition.
+
+d. **Active voice with a named actor, and never invent the actor.** If the source never names who does the action, keep the passive or recast it as an instruction. Do not fabricate a team or system to own it. Extends rule 29.
+
+e. **One word, one meaning, one part of speech, for the whole reply.** Pick one verb for one action and reuse it: `make sure that` for check/verify/confirm/validate/ensure. Never rotate synonyms for the same thing in one text. The part-of-speech traps pass a string check and still break: "the required parts" (participle of an unapproved verb), "check the valve" (verb against noun).
+
+f. **No semicolons.** Name the relation ("because", "but", "for example") or write two sentences. Same fix as rule 13.
+
+g. **No phrasal verbs where a single verb works.** spin up becomes start, reach out becomes contact, dive into becomes read, kick off becomes start. A two-word verb has meanings the parts do not predict.
+
+h. **Hedges are content.** Never upgrade "may have" to "did", and never delete `can` or `must` to look more confident. If a compound tense carries information a simple one cannot (current relevance), keep it.
+
+i. **Meaning fidelity is rule 0.** A rewrite that states a false or empty thing is a worse failure than one that keeps a flagged word. Preserve every fact, condition, scope qualifier, and number. Never add a fact the source did not state. If the text has nothing to say, say so instead of polishing it.
+
+j. **Reporting results.** For task, result, and diagnosis replies:
+   - First sentence: the status and scope (result), the current action (progress), the cause or "cause unconfirmed" (diagnosis), the pending decision (request).
+   - Separate work status from verification status: "done" is not "verified". For any effect or behavior claim: method, result, coverage. Not run is "unverified"; no evidence is "unconfirmed" plus how to confirm; a failed check quotes the key failing output.
+   - No process narration. The reader gets the key information and evidence, not the journey.
+   - Evidence locatable: `path:line`, commit hash, the full command.
+   - Decisions as numbered options, each one action plus its consequence, recommended option first.
+   - Uncertainty labeled ("unconfirmed" plus the confirmation method), never masked by "probably", "likely", or "should be".
+
+k. **Reply shape.** Prose by default. A list or table only when the content has that shape: separate blocks, 3 or more parallel items, ordered steps, a comparison across attributes. The first sentence gives the answer, not a restatement of the question. Never shorten quoted error text, security warnings, or confirmations before destructive actions.
+
+l. **Self-check before delivering.** Scan for `;` and `—` and remove each. Check each bold and each list item carries the shape it claims. Count the three longest sentences, split the ones over cap. Search for `has been`, `should`, `may`, and synonym-rotation pairs. For procedures, check each step names what it depends on: the host, the flag, the prior step.
+
+For documents, the deep layer is the `technical-writing` skill (STE plus Global English, on demand). A full ASD-STE100 check (the dictionary, part-of-speech rulings, all 53 rules) is on request, not always on.
 
 ## Patterns to detect and fix
 

@@ -39,6 +39,8 @@ Use the helper so rows stay well-formed: `scripts/log.sh <logfile> <phase> <deci
 
 Log decision points and checkpoints, not every action: a fork chosen, a unit completed with its verification result, a pivot or revert with its trigger, a blocker surfaced, a gate fixed. For loop runs, one row per iteration. Skip the trivial and self-evident.
 
+Before a row says done, verify against the real artifact: run the feature, read the actual value, inspect the diff. Proxies don't count — file mtimes, self-reports, cached output, "it compiles". When a check fails, suspect the observation method before the system. Script the check when you can: a rerunnable comparison beats a one-time look, and its output is the evidence cell.
+
 ## Where it lives
 
 By default the log is a working artifact, not committed. Keep it at `decisions.tsv` in the work dir, or `.audit/<task-slug>.tsv` when several efforts run at once, and leave it out of git. Most work doesn't need a committed trail; the local log still keeps the run honest and can be discarded after.

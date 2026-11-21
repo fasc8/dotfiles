@@ -97,6 +97,10 @@ If you cannot state the prediction, the hypothesis is a vibe: discard or sharpen
 
 **Show the ranked list to the user before testing.** They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it; proceed with your ranking if the user is AFK.
 
+### When fixes keep failing the same gate
+
+When two or more fixes that share one premise have failed the same gate, suspect the premise, not the fixes. Write the premise down — the one sentence every failed fix assumed — and test it directly: find an observation that would come out differently if the premise were false, and make it. Look at how the failures are distributed, not only at how large they are. If the evidence contradicts the premise, find what the failures share that it did not predict; if one part always lands on the losing side, change what puts it there instead of adding a mechanism that cleans up after it. Do not start the next fix before the premise is written down and tested.
+
 ## Phase 4: Instrument
 
 Each probe must map to a specific prediction from Phase 3. **Change one variable at a time.**

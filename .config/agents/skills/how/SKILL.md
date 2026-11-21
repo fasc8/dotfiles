@@ -57,6 +57,8 @@ Each explorer gets the same base prompt from `references/explorer-prompt.md` plu
 
 Each explorer returns structured findings: components found, flow traced, files read, anything non-obvious. Overlap between explorers is fine; the explainer reconciles.
 
+Guard the context window: the explorers carry the bulk payloads — file reads, long greps, raw output — and only their structured summaries come back to the main thread. Never paste raw exploration output into the main conversation; the main thread is for synthesis, and context overflow degrades the reasoning that depends on it.
+
 Then proceed to Step 3.
 
 ### Step 2b. Direct Explain (simple questions)
