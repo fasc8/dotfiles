@@ -32,7 +32,27 @@
           },
           "settings": {
             "reasoningEffort": "low"
-          }
+          },
+          "variants": [
+            {
+              "id": "low",
+              "settings": {
+                "reasoningEffort": "low"
+              }
+            },
+            {
+              "id": "medium",
+              "settings": {
+                "reasoningEffort": "medium"
+              }
+            },
+            {
+              "id": "high",
+              "settings": {
+                "reasoningEffort": "high"
+              }
+            }
+          ]
         }
       }
     }
