@@ -6,7 +6,7 @@
   },
   "session": {
     "thinking": "show",
-    "sidebar": "auto",
+    "sidebar": "hide",
     "scrollbar": true,
     "submit_scroll": "bottom",
     "markdown": "source",
