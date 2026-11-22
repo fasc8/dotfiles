@@ -30,7 +30,7 @@
             "context": 122900,
             "output": 16384
           },
-          "options": {
+          "settings": {
             "reasoningEffort": "low"
           }
         }
