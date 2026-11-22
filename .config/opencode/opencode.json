@@ -28,7 +28,10 @@
           },
           "limit": {
             "context": 122900,
-            "output": 8192
+            "output": 16384
+          },
+          "options": {
+            "reasoningEffort": "low"
           }
         }
       }
